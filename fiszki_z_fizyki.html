@@ -1,0 +1,2627 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fiszki z Fizyki — Kolokwium (Kinematyka, Dynamika, Pęd, Praca, Moc i Energia)</title>
+  <style>
+    /* ==========================================================================
+       DESIGN TOKENS & MOTYWY (Ciemny wieczorny / Jasny dzienny)
+       ========================================================================== */
+    :root {
+      --bg-body: #090e1a;
+      --bg-surface: #111827;
+      --bg-card: #162033;
+      --bg-card-back: #131c2e;
+      --bg-elevated: #1e293b;
+      --bg-math: #0c1424;
+      --border-subtle: rgba(148, 163, 184, 0.16);
+      --border-strong: rgba(148, 163, 184, 0.30);
+
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+
+      --accent-known: #10b981;
+      --accent-known-bg: rgba(16, 185, 129, 0.14);
+      --accent-review: #f59e0b;
+      --accent-review-bg: rgba(245, 158, 11, 0.15);
+      --accent-danger: #f43f5e;
+      --accent-danger-bg: rgba(244, 63, 94, 0.13);
+
+      /* Kolory 6 kategorii fizyki */
+      --cat-kin1d: #38bdf8;
+      --cat-kin1d-bg: rgba(56, 189, 248, 0.14);
+      --cat-rzuty: #a78bfa;
+      --cat-rzuty-bg: rgba(167, 139, 250, 0.14);
+      --cat-rzeka: #2dd4bf;
+      --cat-rzeka-bg: rgba(45, 212, 191, 0.14);
+      --cat-dynamika: #fbbf24;
+      --cat-dynamika-bg: rgba(251, 191, 36, 0.14);
+      --cat-ped: #fb7185;
+      --cat-ped-bg: rgba(251, 113, 133, 0.14);
+      --cat-energia: #34d399;
+      --cat-energia-bg: rgba(52, 211, 153, 0.14);
+
+      --shadow-card: 0 20px 45px -12px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(148, 163, 184, 0.14);
+      --shadow-soft: 0 8px 24px -8px rgba(0, 0, 0, 0.35);
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-pill: 999px;
+
+      --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+      --font-math: "Cambria Math", "STIX Two Math", "Latin Modern Math", Georgia, "Times New Roman", serif;
+    }
+
+    [data-theme="light"] {
+      --bg-body: #f1f5f9;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-back: #fcfdff;
+      --bg-elevated: #e2e8f0;
+      --bg-math: #f8fafc;
+      --border-subtle: rgba(15, 23, 42, 0.10);
+      --border-strong: rgba(15, 23, 42, 0.20);
+
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+
+      --accent-known: #059669;
+      --accent-known-bg: rgba(5, 150, 105, 0.11);
+      --accent-review: #d97706;
+      --accent-review-bg: rgba(217, 119, 6, 0.12);
+      --accent-danger: #e11d48;
+      --accent-danger-bg: rgba(225, 29, 72, 0.09);
+
+      --cat-kin1d: #0284c7;
+      --cat-kin1d-bg: rgba(2, 132, 199, 0.11);
+      --cat-rzuty: #7c3aed;
+      --cat-rzuty-bg: rgba(124, 58, 237, 0.11);
+      --cat-rzeka: #0d9488;
+      --cat-rzeka-bg: rgba(13, 148, 136, 0.11);
+      --cat-dynamika: #b45309;
+      --cat-dynamika-bg: rgba(180, 83, 9, 0.11);
+      --cat-ped: #be123c;
+      --cat-ped-bg: rgba(190, 18, 60, 0.10);
+      --cat-energia: #047857;
+      --cat-energia-bg: rgba(4, 120, 87, 0.11);
+
+      --shadow-card: 0 20px 40px -15px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 6px 18px -6px rgba(15, 23, 42, 0.10);
+    }
+
+    /* ==========================================================================
+       RESET & PODSTAWY
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-body);
+      color: var(--text-primary);
+      line-height: 1.55;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      background-image:
+        radial-gradient(ellipse 80% 45% at 50% -15%, rgba(56, 189, 248, 0.10), transparent),
+        radial-gradient(ellipse 60% 40% at 95% 10%, rgba(167, 139, 250, 0.08), transparent);
+    }
+
+    button, input {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    button:focus-visible, input:focus-visible {
+      outline: 2px solid var(--cat-kin1d);
+      outline-offset: 2px;
+    }
+
+    /* ==========================================================================
+       LAYOUT GŁÓWNY I NAGŁÓWEK
+       ========================================================================== */
+    .app-container {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 18px 16px 48px;
+    }
+
+    .top-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      display: grid;
+      place-items: center;
+      color: #090e1a;
+      font-weight: 800;
+      font-size: 1.25rem;
+      box-shadow: 0 8px 20px -4px rgba(56, 189, 248, 0.45);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: clamp(1.15rem, 2.5vw, 1.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .brand-sub {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Przełącznik trybu widoku (Fiszki / Ściągawka) */
+    .segmented-control {
+      display: inline-flex;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-pill);
+      padding: 4px;
+      gap: 4px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .seg-btn {
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .seg-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .seg-btn.active {
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      color: #ffffff;
+      box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.45);
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-pill);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      display: grid;
+      place-items: center;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .icon-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+
+    /* ==========================================================================
+       PASEK POSTĘPU I STATYSTYKI
+       ========================================================================== */
+    .stats-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .stat-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .stat-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 11px;
+      border-radius: var(--radius-pill);
+      font-size: 0.84rem;
+      font-weight: 600;
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+    }
+
+    .stat-chip.known {
+      background: var(--accent-known-bg);
+      color: var(--accent-known);
+    }
+
+    .stat-chip.review {
+      background: var(--accent-review-bg);
+      color: var(--accent-review);
+    }
+
+    .stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .stat-percent {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+      display: flex;
+    }
+
+    .progress-fill-known {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #34d399);
+      transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .progress-fill-review {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* ==========================================================================
+       FILTRY KATEGORII I WYSZUKIWARKA
+       ========================================================================== */
+    .filters-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .filters-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 13px;
+      border-radius: var(--radius-pill);
+      font-size: 0.83rem;
+      font-weight: 600;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      transition: all 0.18s ease;
+    }
+
+    .filter-pill:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+
+    .filter-pill .pill-count {
+      font-size: 0.74rem;
+      padding: 1px 7px;
+      border-radius: var(--radius-pill);
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .filter-pill.active {
+      border-color: var(--pill-color, #38bdf8);
+      background: var(--pill-bg, rgba(56, 189, 248, 0.15));
+      color: var(--pill-color, #38bdf8);
+    }
+
+    .filter-pill.active .pill-count {
+      background: var(--pill-color, #38bdf8);
+      color: #090e1a;
+    }
+
+    [data-theme="light"] .filter-pill.active .pill-count {
+      color: #ffffff;
+    }
+
+    .filter-pill.review-toggle {
+      margin-left: auto;
+      border-style: dashed;
+      border-color: rgba(245, 158, 11, 0.45);
+      color: var(--accent-review);
+    }
+
+    .filter-pill.review-toggle.active {
+      border-style: solid;
+      background: var(--accent-review-bg);
+      border-color: var(--accent-review);
+      color: var(--accent-review);
+    }
+
+    .filter-pill.review-toggle.active .pill-count {
+      background: var(--accent-review);
+      color: #090e1a;
+    }
+
+    .search-bar-wrap {
+      display: none;
+      position: relative;
+      max-width: 420px;
+      width: 100%;
+    }
+
+    .search-bar-wrap.visible {
+      display: block;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      transition: border-color 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--cat-kin1d);
+      outline: none;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       STYLE WZORÓW MATEMATYCZNYCH (Czysty HTML/CSS bez CDN)
+       ========================================================================== */
+    .math-block {
+      background: var(--bg-math);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      margin: 12px 0;
+      text-align: center;
+      overflow-x: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .math-main {
+      font-family: var(--font-math);
+      font-size: clamp(1.2rem, 2.8vw, 1.55rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px 14px;
+      line-height: 1.4;
+    }
+
+    .math-line {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .math-alt {
+      font-family: var(--font-math);
+      font-size: 0.96rem;
+      color: var(--text-secondary);
+      padding-top: 8px;
+      border-top: 1px dashed var(--border-subtle);
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px 14px;
+    }
+
+    .math-label {
+      font-family: var(--font-sans);
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-right: 4px;
+    }
+
+    .math-unit {
+      font-family: var(--font-sans);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .m-inline {
+      font-family: var(--font-math);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Prawdziwy pionowy ułamek z kreską ułamkową */
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 3px;
+      line-height: 1.15;
+      font-size: 0.92em;
+    }
+
+    .frac > .num {
+      border-bottom: 1.6px solid currentColor;
+      padding: 0 5px 2px;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .frac > .den {
+      padding: 2px 5px 0;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    /* Pierwiastek z daszkiem */
+    .sqrt {
+      display: inline-flex;
+      align-items: stretch;
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+
+    .sqrt-sym {
+      font-size: 1.25em;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      padding-right: 1px;
+      transform: translateY(1px);
+      font-weight: 400;
+    }
+
+    .sqrt-body {
+      border-top: 1.6px solid currentColor;
+      padding: 2px 4px 0 3px;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1.25;
+    }
+
+    /* Wektor ze strzałką nad literą */
+    .vec {
+      position: relative;
+      display: inline-block;
+      padding-top: 0.12em;
+      margin: 0 1px;
+    }
+
+    .vec::before {
+      content: "→";
+      position: absolute;
+      top: -0.52em;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.65em;
+      line-height: 1;
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    sub, sup {
+      font-size: 0.7em;
+      line-height: 0;
+    }
+
+    /* ==========================================================================
+       TRYB FISZEK — SCENA 3D I KARTA
+       ========================================================================== */
+    .flashcard-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .deck-meta-bar {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .deck-counter {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .deck-tools {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mini-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      transition: all 0.18s ease;
+    }
+
+    .mini-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    .mini-btn.danger:hover {
+      border-color: var(--accent-danger);
+      color: var(--accent-danger);
+      background: var(--accent-danger-bg);
+    }
+
+    /* Kontener z perspektywą 3D */
+    .card-scene {
+      width: 100%;
+      max-width: 780px;
+      perspective: 1500px;
+      margin-bottom: 20px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Grid stacking pozwala obu stronom mieć tę samą dynamiczną wysokość bez ucinania tekstu */
+    .card-inner {
+      display: grid;
+      width: 100%;
+      min-height: 450px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+      cursor: pointer;
+    }
+
+    .card-inner.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      grid-area: 1 / 1;
+      width: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: var(--radius-xl);
+      padding: 26px 28px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      border-top: 4px solid var(--card-accent, #38bdf8);
+    }
+
+    .card-front {
+      background: var(--bg-card);
+      justify-content: space-between;
+    }
+
+    .card-back {
+      background: var(--bg-card-back);
+      transform: rotateY(180deg);
+      justify-content: flex-start;
+      gap: 10px;
+    }
+
+    .card-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .cat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      background: var(--card-accent-bg);
+      color: var(--card-accent);
+    }
+
+    .card-right-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-badge {
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-badge.known {
+      background: var(--accent-known-bg);
+      color: var(--accent-known);
+    }
+
+    .status-badge.review {
+      background: var(--accent-review-bg);
+      color: var(--accent-review);
+    }
+
+    .card-num {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg-elevated);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+    }
+
+    .front-content {
+      margin: auto 0;
+      padding: 28px 6px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .front-title {
+      font-size: clamp(1.4rem, 3.2vw, 1.95rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      color: var(--text-primary);
+    }
+
+    .front-question {
+      font-size: clamp(1rem, 2.2vw, 1.15rem);
+      color: var(--text-secondary);
+      max-width: 580px;
+      line-height: 1.6;
+    }
+
+    .front-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      font-weight: 500;
+    }
+
+    .back-title {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+
+    /* Sekcje na odwrocie fiszki */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .info-box {
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.91rem;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
+    .info-box-head {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+
+    .info-box.when .info-box-head {
+      color: var(--cat-kin1d);
+    }
+
+    .info-box.tip {
+      background: var(--accent-review-bg);
+      border-color: rgba(245, 158, 11, 0.32);
+    }
+
+    .info-box.tip.red-flag {
+      background: var(--accent-danger-bg);
+      border-color: rgba(244, 63, 94, 0.35);
+    }
+
+    .info-box.tip .info-box-head {
+      color: var(--accent-review);
+    }
+
+    .info-box.tip.red-flag .info-box-head {
+      color: var(--accent-danger);
+    }
+
+    .info-box.example .info-box-head {
+      color: var(--accent-known);
+    }
+
+    /* ==========================================================================
+       PRZYCISKI STEROWANIA I OCENY POD FISZKĄ
+       ========================================================================== */
+    .controls-stack {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .rating-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .rate-btn {
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.18s ease;
+      border: 1.5px solid transparent;
+    }
+
+    .rate-btn.review-btn {
+      background: var(--accent-review-bg);
+      border-color: rgba(245, 158, 11, 0.45);
+      color: var(--accent-review);
+    }
+
+    .rate-btn.review-btn:hover {
+      background: var(--accent-review);
+      color: #090e1a;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -6px rgba(245, 158, 11, 0.5);
+    }
+
+    .rate-btn.known-btn {
+      background: var(--accent-known-bg);
+      border-color: rgba(16, 185, 129, 0.45);
+      color: var(--accent-known);
+    }
+
+    .rate-btn.known-btn:hover {
+      background: var(--accent-known);
+      color: #090e1a;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -6px rgba(16, 185, 129, 0.5);
+    }
+
+    .nav-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .nav-btn {
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.18s ease;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .nav-btn:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    .nav-btn.flip-btn {
+      padding: 12px 22px;
+      background: var(--bg-elevated);
+      font-weight: 700;
+    }
+
+    .kbd-legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px 18px;
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .kbd-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    kbd {
+      font-family: inherit;
+      font-size: 0.73rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
+      box-shadow: 0 2px 0 var(--border-subtle);
+    }
+
+    /* ==========================================================================
+       TRYB ŚCIĄGAWKI / LISTY (SIATKA KART)
+       ========================================================================== */
+    .cheatsheet-view {
+      display: none;
+    }
+
+    .cheatsheet-view.active {
+      display: block;
+    }
+
+    .flashcard-view.hidden {
+      display: none;
+    }
+
+    .cheatsheet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+      gap: 18px;
+    }
+
+    .sheet-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-top: 4px solid var(--card-accent, #38bdf8);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .sheet-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card);
+    }
+
+    .sheet-card .math-block {
+      margin: 4px 0;
+      padding: 12px 14px;
+    }
+
+    .sheet-card .math-main {
+      font-size: 1.18rem;
+    }
+
+    .sheet-footer {
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      gap: 8px;
+    }
+
+    .sheet-rate-btn {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 10px;
+      font-size: 0.79rem;
+      font-weight: 700;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+    }
+
+    .sheet-rate-btn.is-review {
+      background: var(--accent-review-bg);
+      border-color: var(--accent-review);
+      color: var(--accent-review);
+    }
+
+    .sheet-rate-btn.is-known {
+      background: var(--accent-known-bg);
+      border-color: var(--accent-known);
+      color: var(--accent-known);
+    }
+
+    /* ==========================================================================
+       PUSTY STAN, MODAL POTWIERDZENIA I TOAST
+       ========================================================================== */
+    .empty-state {
+      width: 100%;
+      max-width: 600px;
+      margin: 24px auto;
+      padding: 36px 24px;
+      text-align: center;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .empty-state.visible {
+      display: flex;
+    }
+
+    .empty-emoji {
+      font-size: 2.5rem;
+    }
+
+    .primary-btn {
+      margin-top: 6px;
+      padding: 11px 20px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: 0 6px 18px -4px rgba(99, 102, 241, 0.45);
+      transition: transform 0.15s ease;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    /* Modal zamiast window.confirm() */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.72);
+      backdrop-filter: blur(4px);
+      display: none;
+      place-items: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: grid;
+    }
+
+    .modal-dialog {
+      width: 100%;
+      max-width: 420px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .modal-desc {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      font-weight: 700;
+      transition: all 0.15s ease;
+    }
+
+    .modal-btn.cancel {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .modal-btn.confirm-danger {
+      background: var(--accent-danger);
+      color: #ffffff;
+    }
+
+    /* Powiadomienie Toast */
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      padding: 10px 18px;
+      border-radius: var(--radius-pill);
+      font-size: 0.86rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-card);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 950;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ==========================================================================
+       RESPONSYWNOŚĆ (TELEFON I TABLET)
+       ========================================================================== */
+    @media (max-width: 680px) {
+      .app-container {
+        padding: 14px 12px 36px;
+      }
+
+      .card-face {
+        padding: 18px 16px;
+      }
+
+      .card-inner {
+        min-height: 410px;
+      }
+
+      .filter-pill.review-toggle {
+        margin-left: 0;
+      }
+
+      .rating-row {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .nav-btn.flip-btn {
+        grid-column: 1 / -1;
+        order: -1;
+      }
+
+      .kbd-legend {
+        display: none;
+      }
+
+      .cheatsheet-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- NAGŁÓWEK APLIKACJI -->
+    <header class="top-header">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">Δ</div>
+        <div>
+          <h1 class="brand-title">Fiszki z Fizyki — Kolokwium</h1>
+          <p class="brand-sub">Kinematyka • Dynamika • Pęd • Praca, Moc i Energia</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="segmented-control" role="tablist" aria-label="Tryb widoku">
+          <button id="btnViewCards" class="seg-btn active" role="tab" aria-selected="true" type="button">
+            <span>🃏</span> Fiszki
+          </button>
+          <button id="btnViewSheet" class="seg-btn" role="tab" aria-selected="false" type="button">
+            <span>📋</span> Ściągawka
+          </button>
+        </div>
+
+        <button id="btnTheme" class="icon-btn" type="button" title="Przełącz tryb jasny / ciemny" aria-label="Przełącz tryb jasny lub ciemny">
+          <span id="themeIcon" aria-hidden="true">☀️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- PANEL POSTĘPU I STATYSTYK -->
+    <section class="stats-panel" aria-label="Statystyki nauki">
+      <div class="stats-row">
+        <div class="stat-chips">
+          <span class="stat-chip known">
+            <span class="stat-dot"></span>
+            Umiem: <strong id="statKnown">0</strong>
+          </span>
+          <span class="stat-chip review">
+            <span class="stat-dot"></span>
+            Do powtórki: <strong id="statReview">0</strong>
+          </span>
+          <span class="stat-chip">
+            Pozostało: <strong id="statRemaining">35</strong>
+          </span>
+        </div>
+        <div class="stat-percent">
+          Opanowano: <span id="statPercent">0%</span>
+        </div>
+      </div>
+      <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar">
+        <div class="progress-fill-known" id="progressKnown" style="width: 0%"></div>
+        <div class="progress-fill-review" id="progressReview" style="width: 0%"></div>
+      </div>
+    </section>
+
+    <!-- FILTRY KATEGORII I WYSZUKIWARKA -->
+    <section class="filters-wrapper" aria-label="Filtry kategorii">
+      <div class="filters-bar" id="filtersBar"></div>
+      <div class="search-bar-wrap" id="searchBarWrap">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input
+          type="search"
+          id="searchInput"
+          class="search-input"
+          placeholder="Szukaj wzoru, pojęcia lub słowa (np. tarcie, moc, rzut, delta)..."
+          autocomplete="off"
+        />
+      </div>
+    </section>
+
+    <!-- PUSTY STAN (np. gdy brak kart do powtórki lub brak wyników wyszukiwania) -->
+    <section class="empty-state" id="emptyState">
+      <div class="empty-emoji" id="emptyEmoji">🎉</div>
+      <h2 id="emptyTitle">Brak fiszek w tym filtrze</h2>
+      <p id="emptyDesc" style="color: var(--text-secondary); max-width: 440px;">
+        Wszystkie karty z tego zestawu są już opanowane lub filtr nie ma pasujących wyników.
+      </p>
+      <button type="button" class="primary-btn" id="btnResetFilter">Pokaż wszystkie fiszki</button>
+    </section>
+
+    <!-- WIDOK 1: TRYB FISZEK 3D -->
+    <main class="flashcard-view" id="flashcardView">
+      <div class="deck-meta-bar">
+        <div class="deck-counter" id="deckCounter">Fiszka 1 z 35</div>
+        <div class="deck-tools">
+          <button type="button" class="mini-btn" id="btnShuffle" title="Przetasuj aktualną talię">
+            🔀 Tasuj
+          </button>
+          <button type="button" class="mini-btn danger" id="btnResetProgress" title="Wyczyść zapisany postęp">
+            ↺ Resetuj postęp
+          </button>
+        </div>
+      </div>
+
+      <div class="card-scene" id="cardScene">
+        <div class="card-inner" id="cardInner" role="button" tabindex="0" aria-label="Fiszka — kliknij lub wciśnij Spację, aby odwrócić">
+          <!-- PRZÓD FISZKI -->
+          <div class="card-face card-front" id="cardFront">
+            <div class="card-top-row">
+              <span class="cat-badge" id="frontCatBadge">Kategoria</span>
+              <div class="card-right-badges">
+                <span class="status-badge" id="frontStatusBadge" style="display: none;"></span>
+                <span class="card-num" id="frontCardNum">#1</span>
+              </div>
+            </div>
+
+            <div class="front-content">
+              <h2 class="front-title" id="frontTitle">Tytuł zagadnienia</h2>
+              <p class="front-question" id="frontQuestion">Pytanie naprowadzające...</p>
+            </div>
+
+            <div class="front-hint">
+              <span>👆 Kliknij kartę lub wciśnij <kbd>Spacja</kbd>, aby sprawdzić wzór i tipy</span>
+            </div>
+          </div>
+
+          <!-- TYŁ FISZKI -->
+          <div class="card-face card-back" id="cardBack">
+            <div class="card-top-row">
+              <span class="cat-badge" id="backCatBadge">Kategoria</span>
+              <div class="card-right-badges">
+                <span class="status-badge" id="backStatusBadge" style="display: none;"></span>
+                <span class="card-num" id="backCardNum">#1</span>
+              </div>
+            </div>
+
+            <h3 class="back-title" id="backTitle">Tytuł</h3>
+
+            <!-- Wzór matematyczny + przekształcenia + jednostka -->
+            <div class="math-block" id="backMathBlock"></div>
+
+            <div class="info-grid">
+              <div class="info-box when">
+                <div class="info-box-head">📌 Kiedy stosować</div>
+                <div id="backWhen"></div>
+              </div>
+
+              <div class="info-box tip" id="backTipBox">
+                <div class="info-box-head" id="backTipHead">⚠️ Tip / Pułapka na kolokwium</div>
+                <div id="backTip"></div>
+              </div>
+
+              <div class="info-box example">
+                <div class="info-box-head">💡 Krótki przykład / Dodatkowe info</div>
+                <div id="backExample"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRZYCISKI OCENY I NAWIGACJI -->
+      <div class="controls-stack">
+        <div class="rating-row">
+          <button type="button" class="rate-btn review-btn" id="btnMarkReview">
+            🔁 Do powtórki <kbd>1</kbd>
+          </button>
+          <button type="button" class="rate-btn known-btn" id="btnMarkKnown">
+            ✅ Umiem to! <kbd>2</kbd>
+          </button>
+        </div>
+
+        <div class="nav-row">
+          <button type="button" class="nav-btn" id="btnPrev">← Poprzednia</button>
+          <button type="button" class="nav-btn flip-btn" id="btnFlip">🔄 Odwróć fiszkę</button>
+          <button type="button" class="nav-btn" id="btnNext">Następna →</button>
+        </div>
+
+        <div class="kbd-legend" aria-label="Skróty klawiszowe">
+          <span class="kbd-item"><kbd>Spacja</kbd> Odwróć</span>
+          <span class="kbd-item"><kbd>←</kbd> <kbd>→</kbd> Nawigacja</span>
+          <span class="kbd-item"><kbd>1</kbd> Do powtórki</span>
+          <span class="kbd-item"><kbd>2</kbd> Umiem</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- WIDOK 2: TRYB ŚCIĄGAWKI / LISTY -->
+    <section class="cheatsheet-view" id="cheatsheetView" aria-label="Lista wzorów do szybkiego przeglądu">
+      <div class="cheatsheet-grid" id="cheatsheetGrid"></div>
+    </section>
+  </div>
+
+  <!-- WŁASNY MODAL POTWIERDZENIA RESETU (bez native confirm()) -->
+  <div class="modal-backdrop" id="resetModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-dialog">
+      <h3 class="modal-title" id="modalTitle">Wyzerować zapisany postęp?</h3>
+      <p class="modal-desc">
+        Wszystkie oznaczenia „Umiem” oraz „Do powtórki” dla 35 fiszek zostaną wyczyszczone. Tej operacji nie można cofnąć.
+      </p>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn cancel" id="btnCancelReset">Anuluj</button>
+        <button type="button" class="modal-btn confirm-danger" id="btnConfirmReset">Tak, resetuj</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POWIADOMIENIE TOAST -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ========================================================================
+         POMOCNIKI DO BUDOWANIA ESTETYCZNYCH WZORÓW MATEMATYCZNYCH (HTML/CSS)
+         ======================================================================== */
+      const frac = (num, den) =>
+        `<span class="frac"><span class="num">${num}</span><span class="den">${den}</span></span>`;
+
+      const sqrt = (body) =>
+        `<span class="sqrt"><span class="sqrt-sym">√</span><span class="sqrt-body">${body}</span></span>`;
+
+      const vec = (letter) => `<span class="vec">${letter}</span>`;
+      const m = (expr) => `<span class="m-inline">${expr}</span>`;
+
+      /* ========================================================================
+         DEFINICJA KATEGORII FIZYKI I ICH AKCENTÓW KOLORYSTYCZNYCH
+         ======================================================================== */
+      const CATEGORIES = [
+        { id: "all", name: "Wszystkie", color: "var(--cat-kin1d)", bg: "var(--cat-kin1d-bg)" },
+        { id: "kin1d", name: "Kinematyka 1D", color: "var(--cat-kin1d)", bg: "var(--cat-kin1d-bg)" },
+        { id: "rzuty", name: "Ruch pionowy i Rzuty 2D", color: "var(--cat-rzuty)", bg: "var(--cat-rzuty-bg)" },
+        { id: "rzeka", name: "Ruch względny (Rzeka)", color: "var(--cat-rzeka)", bg: "var(--cat-rzeka-bg)" },
+        { id: "dynamika", name: "Dynamika i Równia", color: "var(--cat-dynamika)", bg: "var(--cat-dynamika-bg)" },
+        { id: "ped", name: "Pęd i Popęd", color: "var(--cat-ped)", bg: "var(--cat-ped-bg)" },
+        { id: "energia", name: "Praca, Moc i Energia", color: "var(--cat-energia)", bg: "var(--cat-energia-bg)" }
+      ];
+
+      const CAT_MAP = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
+
+      /* ========================================================================
+         PEŁNA BAZA 35 FISZEK (Kinematyka 1D, Rzuty, Rzeka, Dynamika, Pęd, Energia)
+         ======================================================================== */
+      const FLASHCARDS = [
+        /* -------------------- KATEGORIA 1: KINEMATYKA 1D -------------------- */
+        {
+          id: 1,
+          category: "kin1d",
+          title: "Ruch jednostajny prostoliniowy i zamiana jednostek",
+          question: "Jakie wzory łączą drogę, prędkość i czas w ruchu ze stałą prędkością oraz jak błyskawicznie zamienić km/h na m/s?",
+          formulaMain: `v = ${frac("s", "t")} &nbsp;⇔&nbsp; s = v · t &nbsp;⇔&nbsp; t = ${frac("s", "v")}`,
+          formulaAlt: `<span class="math-label">Jednostki:</span> km/h → m/s (dziel przez 3,6) &nbsp;|&nbsp; m/s → km/h (mnóż przez 3,6)`,
+          unit: "SI: [v] = m/s, [s] = m, [t] = s",
+          when: "Gdy ciało porusza się po prostej ze stałą prędkością (nie przyspiesza i nie hamuje, a = 0).",
+          tip: "ZAWSZE zamieniaj km/h na m/s zanim wstawisz dane do wzorów! Zapamiętaj częste pary: 36 km/h = 10 m/s, 72 km/h = 20 m/s, 90 km/h = 25 m/s, 108 km/h = 30 m/s.",
+          redFlag: false,
+          example: `Auto jedzie 108 km/h przez 5 s: ${m("v = 108 / 3,6 = 30 m/s")}, więc przebyta droga to ${m("s = 30 · 5 = 150 m")}.`
+        },
+        {
+          id: 2,
+          category: "kin1d",
+          title: "Prędkość średnia na całej trasie",
+          question: "Jak poprawnie obliczyć prędkość średnią, gdy trasa składa się z kilku różnych etapów?",
+          formulaMain: `v<sub>śr</sub> = ${frac("s<sub>całk</sub>", "t<sub>całk</sub>")} = ${frac("s<sub>1</sub> + s<sub>2</sub> + ...", "t<sub>1</sub> + t<sub>2</sub> + ...")}`,
+          formulaAlt: `<span class="math-label">Równe odcinki drogi:</span> v<sub>śr</sub> = ${frac("2 · v<sub>1</sub> · v<sub>2</sub>", "v<sub>1</sub> + v<sub>2</sub>")}`,
+          unit: "SI: [v_śr] = m/s",
+          when: "Gdy ciało jedzie z różnymi prędkościami na różnych odcinkach drogi lub w różnych przedziałach czasu.",
+          tip: "NIGDY nie licz zwykłej średniej arytmetycznej (v₁ + v₂)/2, chyba że wiesz na 100%, iż oba etapy trwały DOKŁADNIE tyle samo czasu! Dla równych dróg (np. tam i z powrotem) wynik to średnia harmoniczna.",
+          redFlag: true,
+          example: `60 km w 1 h i kolejne 60 km w 2 h: ${m("v<sub>śr</sub> = (60 + 60) / (1 + 2) = 120 / 3 = 40 km/h")} (a nie błędne 45 km/h!).`
+        },
+        {
+          id: 3,
+          category: "kin1d",
+          title: "Ruch 1D — gdy brakuje drogi (s)",
+          question: "Który ze złotych wzorów kinematyki 1D wybierzesz, gdy w treści zadania nie ma drogi s?",
+          formulaMain: `v<sub>k</sub> = v<sub>0</sub> + a · t`,
+          formulaAlt: `<span class="math-label">Przekształcenia:</span> a = ${frac("v<sub>k</sub> − v<sub>0</sub>", "t")} &nbsp;|&nbsp; t = ${frac("v<sub>k</sub> − v<sub>0</sub>", "a")}`,
+          unit: "SI: [a] = m/s²",
+          when: "W ruchu jednostajnie przyspieszonym lub opóźnionym, gdy znasz/szukasz v₀, v_k, a oraz t, a droga s nie pojawia się w zadaniu.",
+          tip: "Przy hamowaniu przyspieszenie a jest UJEMNE! Jeśli ciało „zatrzymuje się”, wpisz v_k = 0; jeśli „rusza z miejsca”, wpisz v₀ = 0.",
+          redFlag: false,
+          example: `Samochód z ${m("v<sub>0</sub> = 30 m/s")} hamuje z ${m("a = −5 m/s<sup>2</sup>")} do zera: ${m("t = (0 − 30) / (−5) = 6 s")}.`
+        },
+        {
+          id: 4,
+          category: "kin1d",
+          title: "Ruch 1D — gdy brakuje prędkości końcowej (v_k)",
+          question: "Jak policzyć drogę w ruchu jednostajnie zmiennym, kiedy nie znasz prędkości końcowej v_k?",
+          formulaMain: `s = v<sub>0</sub> · t + ${frac("a · t<sup>2</sup>", "2")}`,
+          formulaAlt: `<span class="math-label">Start z miejsca (v₀ = 0):</span> s = ${frac("a · t<sup>2</sup>", "2")} &nbsp;|&nbsp; a = ${frac("2s", "t<sup>2</sup>")} &nbsp;|&nbsp; t = ${sqrt(frac("2s", "a"))}`,
+          unit: "SI: [s] = m",
+          when: "Gdy znasz przyspieszenie a i czas t (oraz v₀), a pytają o przebytą drogę s — bez podawania prędkości końcowej.",
+          tip: "CZERWONA LAMPKA! Nigdy nie zapominaj o ułamku 1/2 przed a·t² — ciało nie jedzie z prędkością końcową przez cały czas! Zawsze sprawdzaj ten czynnik 1/2 przed zapisaniem wyniku.",
+          redFlag: true,
+          example: `Skrzynia rusza z miejsca (${m("v<sub>0</sub> = 0")}) z ${m("a = 4 m/s<sup>2</sup>")} przez 4 s: ${m("s = (4 · 16) / 2 = 32 m")} (nie 64 m!).`
+        },
+        {
+          id: 5,
+          category: "kin1d",
+          title: "Ruch 1D — wzór BEZ CZASU (gdy brakuje t)",
+          question: "Jak obliczyć przyspieszenie, drogę lub prędkość, kiedy w treści zadania w ogóle NIE podano czasu t?",
+          formulaMain: `v<sub>k</sub><sup>2</sup> − v<sub>0</sub><sup>2</sup> = 2 · a · s`,
+          formulaAlt: `<span class="math-label">Przekształcenia:</span> a = ${frac("v<sub>k</sub><sup>2</sup> − v<sub>0</sub><sup>2</sup>", "2s")} &nbsp;|&nbsp; v<sub>k</sub> = ${sqrt("v<sub>0</sub><sup>2</sup> + 2 · a · s")}`,
+          unit: "SI: [v²] = m²/s²",
+          when: "Ratunek w zadaniach z hamowaniem na danej drodze, liczeniem prędkości w połowie drogi oraz zjazdem z równi bez podanego czasu.",
+          tip: "Prędkość w połowie drogi hamowania to NIE połowa v₀ (wychodzi v₀ / √2 ≈ 70,7% v₀)! Pamiętaj też o minusie przy opóźnieniu a podczas hamowania.",
+          redFlag: false,
+          example: `Pociąg z ${m("v<sub>0</sub> = 20 m/s")} staje na 100 m: ${m("a = (0 − 400) / 200 = −2 m/s<sup>2</sup>")}. Po 50 m: ${m("v<sub>k</sub> = √(400 − 200) = √200 ≈ 14,14 m/s")}.`
+        },
+        {
+          id: 6,
+          category: "kin1d",
+          title: "Ruch 1D — gdy brakuje przyspieszenia (a)",
+          question: "Jak obliczyć drogę lub czas w ruchu jednostajnie zmiennym bez wyznaczania przyspieszenia a?",
+          formulaMain: `s = ${frac("v<sub>0</sub> + v<sub>k</sub>", "2")} · t`,
+          formulaAlt: `<span class="math-label">Przekształcenie:</span> t = ${frac("2 · s", "v<sub>0</sub> + v<sub>k</sub>")}`,
+          unit: "SI: [s] = m, [t] = s",
+          when: "Gdy znasz prędkość początkową v₀, końcową v_k oraz drogę s (lub czas t), a nie interesuje Cię wartość przyspieszenia a.",
+          tip: "Działa WYŁĄCZNIE przy stałym przyspieszeniu (a = const). Geometrycznie jest to dokładnie pole trapezu pod wykresem prędkości v(t).",
+          redFlag: false,
+          example: `Pociąg hamuje od 20 m/s do 0 na drodze 100 m: ${m("t = (2 · 100) / (20 + 0) = 10 s")} — w jednej linijce bez liczenia a!`
+        },
+        {
+          id: 7,
+          category: "kin1d",
+          title: "Droga w samej n-tej sekundzie ruchu",
+          question: "Jak obliczyć drogę przebytą WYŁĄCZNIE w 3. (lub n-tej) sekundzie ruchu, a nie w ciągu wszystkich n sekund?",
+          formulaMain: `Δs<sub>n</sub> = s(n) − s(n − 1)`,
+          formulaAlt: `<span class="math-label">Tylko gdy v₀ = 0:</span> Δs<sub>n</sub> = ${frac("a", "2")} · (2n − 1)`,
+          unit: "SI: [Δs_n] = m",
+          when: "Gdy treść pyta o drogę „w trzeciej sekundzie ruchu” albo „w ostatniej sekundzie hamowania”.",
+          tip: "„W 3. sekundzie” oznacza przedział od t = 2 s do t = 3 s! Wzór (a/2)(2n−1) działa TYLKO dla startu ze spoczynku. Przy hamowaniu (v₀ ≠ 0) licz s(n) − s(n−1) albo średnią prędkość w tej 1 sekundzie: (v(n−1) + v(n))/2 · 1 s.",
+          redFlag: false,
+          example: `Hamowanie: ${m("v<sub>0</sub> = 30 m/s, a = −5 m/s<sup>2</sup>")}. W 3. sekundzie: ${m("v(2) = 20 m/s, v(3) = 15 m/s")} → średnio ${m("17,5 m/s")}, więc ${m("Δs<sub>3</sub> = 17,5 m")}.`
+        },
+        {
+          id: 8,
+          category: "kin1d",
+          title: "Pościg z czasem reakcji (t₀)",
+          question: "Jak zapisać równania położenia uciekającego A (ruch jednostajny) i ścigającego B, który rusza z opóźnieniem t₀?",
+          formulaMain: `x<sub>A</sub>(t') = v<sub>A</sub> · t<sub>0</sub> + v<sub>A</sub> · t' &nbsp;&nbsp;|&nbsp;&nbsp; x<sub>B</sub>(t') = ${frac("a · (t')<sup>2</sup>", "2")}`,
+          formulaAlt: `<span class="math-label">Warunek spotkania:</span> x<sub>B</sub>(t') = x<sub>A</sub>(t') &nbsp;⇒&nbsp; równanie kwadratowe dla t'`,
+          unit: "t' = czas jazdy B; całkowity czas od minięcia: t = t₀ + t'",
+          when: "Gdy pojazd A mija stojący pojazd B, a pojazd B rusza w pościg dopiero po czasie reakcji t₀.",
+          tip: "CZERWONA LAMPKA! Zawsze dopisz przewagę startową s₀ = v_A · t₀ po stronie uciekającego — podczas Twojego czasu reakcji uciekający NIE stoi w miejscu! Nie zapomnij też o 1/2 przy a·(t')².",
+          redFlag: true,
+          example: `Rowerzysta ${m("v<sub>A</sub> = 10 m/s")}, reakcja ${m("t<sub>0</sub> = 3 s")} → przewaga ${m("s<sub>0</sub> = 30 m")}. Równanie: ${m("2,5(t')<sup>2</sup> = 10t' + 30")} ⇒ ${m("t' = 6 s")}, spotkanie na 90 m.`
+        },
+        {
+          id: 9,
+          category: "kin1d",
+          title: "Co oznacza symbol Δ (Delta)?",
+          question: "Co w fizyce oznacza grecka litera Δ przed zmienną i w jakiej kolejności wykonuje się odejmowanie?",
+          formulaMain: `ΔX = X<sub>końcowe</sub> − X<sub>początkowe</sub>`,
+          formulaAlt: `<span class="math-label">Przykłady:</span> Δv = v<sub>k</sub> − v<sub>0</sub> &nbsp;|&nbsp; Δt = t<sub>2</sub> − t<sub>1</sub> &nbsp;|&nbsp; Δp = p<sub>k</sub> − p<sub>0</sub>`,
+          unit: "Jednostka taka sama jak wielkości X",
+          when: "Wszędzie tam, gdzie liczymy przyrost, ubytek, czas trwania, zmianę prędkości, pędu lub stratę energii.",
+          tip: "Zawsze KONIEC minus POCZĄTEK — nigdy odwrotnie! Znak „+” oznacza wzrost, znak „−” oznacza spadek lub zmianę zwrotu. Nie myl fizycznej delty przy zmiennej (Δv, Δp) z matematyczną deltą b² − 4ac w równaniu kwadratowym.",
+          redFlag: false,
+          example: `Prędkość spada z 20 m/s do 0: ${m("Δv = 0 − 20 = −20 m/s")}. Piłka odbija się z +10 na −10 m/s: ${m("Δv = (−10) − (+10) = −20 m/s")}.`
+        },
+
+        /* -------------------- KATEGORIA 2: RUCH PIONOWY I RZUTY 2D -------------------- */
+        {
+          id: 10,
+          category: "rzuty",
+          title: "Spadek swobodny (v₀ = 0)",
+          question: "Jakie wzory opisują ciało upuszczone swobodnie z wysokości h bez prędkości początkowej?",
+          formulaMain: `h = ${frac("g · t<sup>2</sup>", "2")} &nbsp;|&nbsp; t = ${sqrt(frac("2h", "g"))} &nbsp;|&nbsp; v = g · t = ${sqrt("2gh")}`,
+          formulaAlt: `<span class="math-label">Stała na kolokwium:</span> g ≈ 10 m/s² (lub 9,81 m/s² — sprawdź w treści)`,
+          unit: "SI: [h] = m, [t] = s, [v] = m/s",
+          when: "Gdy ciało zostaje upuszczone (puszczone swobodnie, v₀ = 0) z wysokości h i pomijamy opór powietrza.",
+          tip: "Czas spadania i prędkość uderzenia w ziemię NIE zależą od masy ciała — ciężki kamień i lekkie piórko w próżni spadają w tym samym czasie!",
+          redFlag: false,
+          example: `Z dachu ${m("h = 45 m")} (${m("g = 10 m/s<sup>2</sup>")}): ${m("t = √(90 / 10) = 3 s")}, prędkość przy ziemi: ${m("v = 10 · 3 = 30 m/s")}.`
+        },
+        {
+          id: 11,
+          category: "rzuty",
+          title: "Rzut pionowy w górę",
+          question: "Jak opisujemy prędkość, wysokość, czas wznoszenia i maksymalną wysokość ciała wyrzuconego pionowo w górę?",
+          formulaMain: `v(t) = v<sub>0</sub> − g · t &nbsp;|&nbsp; y(t) = v<sub>0</sub> · t − ${frac("g · t<sup>2</sup>", "2")}`,
+          formulaAlt: `<span class="math-label">Szczyt (v = 0):</span> t<sub>w</sub> = ${frac("v<sub>0</sub>", "g")} &nbsp;|&nbsp; H<sub>max</sub> = ${frac("v<sub>0</sub><sup>2</sup>", "2g")} &nbsp;|&nbsp; t<sub>całk</sub> = 2 · t<sub>w</sub>`,
+          unit: "Oś y skierowana w górę (g ze znakiem minus)",
+          when: "Gdy ciało wyrzucone jest pionowo w górę z prędkością v₀ (także w zadaniach ze spotkaniem dwóch kamieni w pionie).",
+          tip: "W najwyższym punkcie ciało na ułamek sekundy staje (v = 0). Jeśli w chwili spotkania v(t) > 0, ciało jeszcze się wznosi; jeśli v(t) < 0, to już spada w dół.",
+          redFlag: false,
+          example: `Kamień rzucony z ${m("v<sub>0</sub> = 20 m/s")}: ${m("t<sub>w</sub> = 20 / 10 = 2 s")}, max wysokość ${m("H<sub>max</sub> = 400 / 20 = 20 m")}, wróci po 4 s.`
+        },
+        {
+          id: 12,
+          category: "rzuty",
+          title: "Rzut poziomy (z wysokości h)",
+          question: "Jak obliczyć czas lotu, zasięg poziomy oraz wartość prędkości końcowej w rzucie poziomym z wieży?",
+          formulaMain: `t = ${sqrt(frac("2h", "g"))} &nbsp;|&nbsp; Z = v<sub>0</sub> · t &nbsp;|&nbsp; v<sub>k</sub> = ${sqrt("v<sub>0</sub><sup>2</sup> + (g · t)<sup>2</sup>")}`,
+          formulaAlt: `<span class="math-label">Składowe prędkości:</span> v<sub>x</sub> = v<sub>0</sub> (stała!) &nbsp;|&nbsp; v<sub>y</sub> = g · t`,
+          unit: "SI: [Z] = m, [v_k] = m/s",
+          when: "Gdy ciało zostaje wyrzucone lub wystrzelone POZIOMO (kąt 0°) z pewnej wysokości h nad ziemią.",
+          tip: "Czas lotu zależy WYŁĄCZNIE od wysokości h — w ogóle nie zależy od prędkości poziomej v₀! Prędkość końcową zawsze licz z Pitagorasa (√(v_x² + v_y²)), a nie przez zwykłe dodawanie.",
+          redFlag: false,
+          example: `Wieża ${m("h = 45 m")}, ${m("v<sub>0</sub> = 40 m/s")}: ${m("t = 3 s")}, ${m("Z = 120 m")}, ${m("v<sub>y</sub> = 30 m/s")} → ${m("v<sub>k</sub> = √(40<sup>2</sup> + 30<sup>2</sup>) = 50 m/s")}.`
+        },
+        {
+          id: 13,
+          category: "rzuty",
+          title: "Rzut ukośny — równania uniwersalne (zawsze działają)",
+          question: "Jak rozbić prędkość w rzucie ukośnym i wyznaczyć wysokość ciała w zadaniu z murem lub rzutem z wieży?",
+          formulaMain: `x(t) = (v<sub>0</sub> cos α) · t &nbsp;|&nbsp; y(t) = y<sub>0</sub> + (v<sub>0</sub> sin α) · t − ${frac("g · t<sup>2</sup>", "2")}`,
+          formulaAlt: `<span class="math-label">Prędkość w chwili t:</span> v<sub>x</sub> = v<sub>0</sub> cos α &nbsp;|&nbsp; v<sub>y</sub>(t) = v<sub>0</sub> sin α − g · t &nbsp;|&nbsp; v = ${sqrt("v<sub>x</sub><sup>2</sup> + v<sub>y</sub><sup>2</sup>")}`,
+          unit: "Start z ziemi: y₀ = 0; start z wieży: y₀ = h",
+          when: "ZAWSZE w rzucie ukośnym — a obowiązkowo wtedy, gdy rzut jest z wysokości y₀ > 0 albo gdy na drodze stoi przeszkoda (mur w odległości d).",
+          tip: "Schemat z murem w odległości d: najpierw wyznacz czas dolotu z osi X: t = d / (v₀·cos α), a dopiero potem podstaw ten czas do y(t) oraz v_y(t). Jeśli v_y < 0, piłka już opada!",
+          redFlag: false,
+          example: `Rzut ${m("v<sub>0</sub> = 20 m/s, α = 30°")}: ${m("v<sub>0x</sub> = 10√3 m/s, v<sub>0y</sub> = 10 m/s")}. W odległości ${m("10√3 m")} leci 1 s → ${m("y = 10·1 − 5·1 = 5 m")}.`
+        },
+        {
+          id: 14,
+          category: "rzuty",
+          title: "Rzut ukośny — wzory skrócone (płaski teren)",
+          question: "Jakie są gotowe wzory na maksymalną wysokość, całkowity czas lotu i zasięg w rzucie ukośnym z ziemi na ziemię?",
+          formulaMain: `H<sub>max</sub> = ${frac("v<sub>0</sub><sup>2</sup> · sin<sup>2</sup>α", "2g")} &nbsp;|&nbsp; t<sub>c</sub> = ${frac("2 v<sub>0</sub> sin α", "g")} &nbsp;|&nbsp; Z = ${frac("v<sub>0</sub><sup>2</sup> · sin(2α)", "g")}`,
+          formulaAlt: `<span class="math-label">W szczycie toru:</span> v<sub>y</sub> = 0, ale v<sub>min</sub> = v<sub>x</sub> = v<sub>0</sub> cos α ≠ 0!`,
+          unit: "UWAGA: działają tylko gdy start i lądowanie są na tym samym poziomie (y₀ = 0)",
+          when: "Gdy rzucasz ciało z powierzchni ziemi (y₀ = 0) pod kątem α i ląduje ono na tym samym płaskim terenie.",
+          tip: "W najwyższym punkcie toru prędkość NIE wynosi zero — zostaje stała składowa pozioma v₀·cos α! Maksymalny zasięg na płaskim terenie zawsze wypada dla α = 45° (bo sin 90° = 1).",
+          redFlag: false,
+          example: `Piłka ${m("v<sub>0</sub> = 20 m/s, α = 45°")}: ${m("Z = (400 · sin 90°) / 10 = 40 m")}, ${m("H<sub>max</sub> = (400 · 0,5) / 20 = 10 m")}.`
+        },
+
+        /* -------------------- KATEGORIA 3: RUCH WZGLĘDNY (RZEKA) -------------------- */
+        {
+          id: 15,
+          category: "rzeka",
+          title: "Łódź wzdłuż rzeki (1D) i spływ bez silnika",
+          question: "Jak składają się prędkości łodzi płynącej z prądem i pod prąd oraz jak obliczyć czas spływu samym nurtem?",
+          formulaMain: `v<sub>z prądem</sub> = v<sub>ł</sub> + v<sub>r</sub> &nbsp;|&nbsp; v<sub>pod prąd</sub> = v<sub>ł</sub> − v<sub>r</sub>`,
+          formulaAlt: `<span class="math-label">Czas spływu bez silnika (z samych czasów t₁ i t₂):</span> t<sub>r</sub> = ${frac("2 · t<sub>1</sub> · t<sub>2</sub>", "t<sub>2</sub> − t<sub>1</sub>")}`,
+          unit: "t₁ = czas z prądem, t₂ = czas pod prąd",
+          when: "Gdy łódź (lub samolot z wiatrem) porusza się wzdłuż nurtu między przystaniami A i B.",
+          tip: "Gdy w zadaniu NIE podano odległości s między przystaniami, zapisz układ równań z s/t₁ i s/t₂ i odejmij je stronami — nieznana odległość s zawsze sama się skróci!",
+          redFlag: false,
+          example: `Z prądem ${m("t<sub>1</sub> = 3 h")}, pod prąd ${m("t<sub>2</sub> = 6 h")}: czas spływu bez silnika to ${m("t<sub>r</sub> = (2 · 3 · 6) / (6 − 3) = 36 / 3 = 12 h")}.`
+        },
+        {
+          id: 16,
+          category: "rzeka",
+          title: "Przeprawa przez rzekę — Wariant A (najszybsza)",
+          question: "Jak policzyć czas przeprawy, znos w dół rzeki i prędkość względem brzegu, gdy dziób jest ustawiony prostopadle do brzegu?",
+          formulaMain: `t<sub>A</sub> = ${frac("d", "v<sub>ł</sub>")} &nbsp;|&nbsp; L = v<sub>r</sub> · t<sub>A</sub> &nbsp;|&nbsp; v<sub>A</sub> = ${sqrt("v<sub>ł</sub><sup>2</sup> + v<sub>r</sub><sup>2</sup>")}`,
+          formulaAlt: `<span class="math-label">Oznaczenia:</span> d = szerokość rzeki, v<sub>ł</sub> = prędkość własna łodzi, v<sub>r</sub> = prędkość nurtu`,
+          unit: "SI: [t_A] = s, [L] = m, [v_A] = m/s",
+          when: "Gdy sternik kieruje dziób dokładnie prostopadle do brzegu (chce przepłynąć rzekę w NAJKRÓTSZYM CZASIE).",
+          tip: "Prąd rzeki w ogóle nie przyspiesza ani nie opóźnia dotarcia na drugi brzeg — czas zależy TYLKO od d i v_ł! Nurt wpływa wyłącznie na znos L w dół rzeki.",
+          redFlag: false,
+          example: `Rzeka ${m("d = 240 m, v<sub>ł</sub> = 10 m/s, v<sub>r</sub> = 6 m/s")}: ${m("t<sub>A</sub> = 240 / 10 = 24 s")}, znos ${m("L = 6 · 24 = 144 m")}.`
+        },
+        {
+          id: 17,
+          category: "rzeka",
+          title: "Przeprawa przez rzekę — Wariant B (najkrótsza droga)",
+          question: "Jak ustawić dziób pod prąd i obliczyć czas przeprawy, aby dopłynąć dokładnie naprzeciwko punktu startu (bez znosu)?",
+          formulaMain: `v<sub>⊥</sub> = ${sqrt("v<sub>ł</sub><sup>2</sup> − v<sub>r</sub><sup>2</sup>")} &nbsp;|&nbsp; t<sub>B</sub> = ${frac("d", "v<sub>⊥</sub>")} &nbsp;|&nbsp; sin θ = ${frac("v<sub>r</sub>", "v<sub>ł</sub>")}`,
+          formulaAlt: `<span class="math-label">Warunek wykonalności:</span> v<sub>ł</sub> &gt; v<sub>r</sub> (łódź musi być szybsza niż nurt!)`,
+          unit: "θ = kąt odchylenia dziobu pod prąd względem prostopadłej",
+          when: "Gdy motorówka ma płynąć po NAJKRÓTSZEJ DRODZE (prostopadle względem brzegu, bez znoszenia w dół rzeki).",
+          tip: "Wariant B zawsze trwa DŁUŻEJ niż wariant A, ponieważ część prędkości własnej silnika zużywasz na równoważenie nurtu rzeki. Pamiętaj o MINUSIE pod pierwiastkiem!",
+          redFlag: false,
+          example: `Dla ${m("d = 240 m, v<sub>ł</sub> = 10 m/s, v<sub>r</sub> = 6 m/s")}: ${m("v<sub>⊥</sub> = √(100 − 36) = 8 m/s")}, ${m("t<sub>B</sub> = 240 / 8 = 30 s")}, ${m("sin θ = 0,6")}.`
+        },
+
+        /* -------------------- KATEGORIA 4: DYNAMIKA I RÓWNIA POCHYŁA -------------------- */
+        {
+          id: 18,
+          category: "dynamika",
+          title: "I i II zasada dynamiki Newtona",
+          question: "Co mówią I i II zasada dynamiki oraz w jaki sposób dynamika łączy się z kinematyką?",
+          formulaMain: `I: F<sub>w</sub> = 0 ⇔ a = 0 &nbsp;&nbsp;|&nbsp;&nbsp; II: F<sub>w</sub> = m · a ⇔ a = ${frac("F<sub>w</sub>", "m")}`,
+          formulaAlt: `<span class="math-label">Wektorowo:</span> ${vec("a")} = ${frac(vec("F") + "<sub>w</sub>", "m")}`,
+          unit: "SI: [F] = 1 N = 1 kg·m/s²",
+          when: "I zasada: gdy ciało stoi lub jedzie ruchem JEDNOSTAJNYM (wszystkie siły się równoważą). II zasada: gdy ciało przyspiesza lub hamuje.",
+          tip: "II zasada dynamiki to główny MOST do kinematyki: najpierw z sił liczysz przyspieszenie a = F_w / m, a potem wstawiasz je do 4 wzorów kinematyki (np. żeby policzyć drogę lub czas). Zawsze używaj siły WYPADKOWEJ F_w!",
+          redFlag: false,
+          example: `Siła ciągnąca 22 N, tarcie 10 N, masa 4 kg: ${m("F<sub>w</sub> = 22 − 10 = 12 N")} → ${m("a = 12 / 4 = 3 m/s<sup>2</sup>")}.`
+        },
+        {
+          id: 19,
+          category: "dynamika",
+          title: "Siła ciężkości i siła tarcia",
+          question: "Jak obliczamy ciężar ciała oraz wartość siły tarcia kinetycznego?",
+          formulaMain: `F<sub>g</sub> = m · g &nbsp;&nbsp;|&nbsp;&nbsp; T = f · F<sub>n</sub>`,
+          formulaAlt: `<span class="math-label">Tylko na płaskim bez sił pionowych:</span> F<sub>n</sub> = m · g &nbsp;⇒&nbsp; T = f · m · g`,
+          unit: "SI: [F_g] = [T] = N; f — bezwymiarowy współczynnik tarcia",
+          when: "W każdym zadaniu z masą ciała w polu grawitacyjnym oraz przy ślizganiu się ciała po chropowatej powierzchni.",
+          tip: "Siła tarcia zależy od siły NACISKU F_n, a NIE zawsze od ciężaru mg (na równi jest m·g·cos α, a przy linie pod kątem m·g − F·sin α)! Zwrot tarcia jest ZAWSZE przeciwny do kierunku ruchu.",
+          redFlag: false,
+          example: `Klocek 4 kg na płaskiej podłodze (${m("f = 0,25")}): ${m("F<sub>n</sub> = 40 N")}, więc ${m("T = 0,25 · 40 = 10 N")}.`
+        },
+        {
+          id: 20,
+          category: "dynamika",
+          title: "Siła nacisku F_n przy ciągnięciu / pchaniu pod kątem α",
+          question: "Jak zmienia się siła nacisku na płaską podłogę, gdy ciągniemy linę pod kątem α w górę lub pchamy skrzynię pod kątem α w dół?",
+          formulaMain: `Ciągnięcie w górę: F<sub>n</sub> = m·g − F·sin α`,
+          formulaAlt: `<span class="math-label">Pchanie w dół:</span> F<sub>n</sub> = m·g + F·sin α &nbsp;|&nbsp; <span class="math-label">Składowa pozioma:</span> F<sub>x</sub> = F · cos α`,
+          unit: "Dla ruchu jednostajnego w górę: F = (f·m·g) / (cos α + f·sin α)",
+          when: "Gdy skrzynia porusza się po POZIOMEJ podłodze, ale siła ciągnąca lub pchająca jest przyłożona pod kątem α do poziomu.",
+          tip: "Ciągnąc linę lekko w górę, część ciężaru przejmują Twoje ręce (F·sin α), więc odciążasz podłogę i ZMNIEJSZASZ tarcie! Pchając w dół, dociskasz skrzynię i tarcie rośnie.",
+          redFlag: false,
+          example: `Skrzynia 100 kg (${m("F<sub>g</sub> = 1000 N")}), lina pod 30°, ${m("f = 0,3")}: ${m("F ≈ 295,3 N")}, więc nacisk spada do ${m("F<sub>n</sub> = 1000 − 147,6 = 852,4 N")}.`
+        },
+        {
+          id: 21,
+          category: "dynamika",
+          title: "Równia pochyła — rozkład siły ciężkości (kąt α)",
+          question: "Na jakie dwie składowe rozkładamy ciężar na równi pochyłej i ile wynosi siła tarcia na stoku?",
+          formulaMain: `F<sub>z</sub> = m · g · sin α &nbsp;|&nbsp; F<sub>n</sub> = F<sub>r</sub> = m · g · cos α`,
+          formulaAlt: `<span class="math-label">Siła tarcia na równi:</span> T = f · F<sub>n</sub> = f · m · g · cos α`,
+          unit: "Dla α = 30°: sin 30° = 0,5; cos 30° = √3/2 ≈ 0,866",
+          when: "Pierwszy, obowiązkowy krok w KAŻDYM zadaniu z równią pochyłą (z tarciem lub bez tarcia).",
+          tip: "Proste skojarzenie na pamięć: SIN = Spada / Zsuwa się w dół równi (równoległa); COS = dociska prostopadle do podłoża. Siła reakcji podłoża F_r zawsze równoważy F_n.",
+          redFlag: false,
+          example: `Skrzynia 20 kg na równi 30° (${m("f = 0,2")}): ${m("F<sub>z</sub> = 100 N")}, ${m("F<sub>n</sub> = 173,2 N")}, ${m("T = 0,2 · 173,2 = 34,64 N")}.`
+        },
+        {
+          id: 22,
+          category: "dynamika",
+          title: "Przyspieszenie na równi — zsuwanie w dół",
+          question: "Jakie jest przyspieszenie ciała swobodnie zsuwającego się z równi (bez tarcia oraz z tarciem)?",
+          formulaMain: `Bez tarcia: a = g · sin α &nbsp;|&nbsp; Z tarciem: a = g · (sin α − f · cos α)`,
+          formulaAlt: `<span class="math-label">Warunek samodzielnego zjazdu:</span> F<sub>z</sub> &gt; T &nbsp;⇔&nbsp; tg α &gt; f`,
+          unit: "SI: [a] = m/s² (masa m całkowicie się skraca!)",
+          when: "Gdy ciało zsuwa się w dół równi pod wpływem samej grawitacji (nikt go nie ciągnie ani nie pcha).",
+          tip: "Masa m zawsze skraca się w równaniu! Jeśli f · cos α ≥ sin α, to tarcie jest większe od siły zsuwającej i klocek stoi w miejscu (a = 0 — nigdy nie pojedzie pod górę od samego tarcia!).",
+          redFlag: false,
+          example: `Gładka równia 30°: ${m("a = 10 · 0,5 = 5 m/s<sup>2</sup>")}. Z tarciem ${m("f = 0,2")}: ${m("a = 10 · (0,5 − 0,2 · 0,866) ≈ 3,27 m/s<sup>2</sup>")}.`
+        },
+        {
+          id: 23,
+          category: "dynamika",
+          title: "Przyspieszenie na równi — wciąganie w górę siłą F_c",
+          question: "Jak obliczyć przyspieszenie skrzyni wciąganej w górę równi siłą F_c równoległą do stoku (bez tarcia i z tarciem)?",
+          formulaMain: `a = ${frac("F<sub>c</sub> − m·g·sin α − f·m·g·cos α", "m")} = ${frac("F<sub>c</sub> − F<sub>z</sub> − T", "m")}`,
+          formulaAlt: `<span class="math-label">Bez tarcia (T = 0):</span> a = ${frac("F<sub>c</sub> − F<sub>z</sub>", "m")} &nbsp;|&nbsp; <span class="math-label">Ruch jednostajny:</span> F<sub>c0</sub> = F<sub>z</sub> + T`,
+          unit: "SI: [a] = m/s²",
+          when: "Gdy człowiek lub silnik wciąga ciało W GÓRĘ równi siłą F_c skierowaną równolegle do powierzchni stoku.",
+          tip: "CZERWONA LAMPKA! Przy wciąganiu w górę siła tarcia T działa W DÓŁ stoku — dokładnie w tę samą stronę co siła zsuwająca F_z! Nie zostawiaj wyliczonego T z boku — odejmij zarówno F_z, jak i T od F_c!",
+          redFlag: true,
+          example: `${m("m = 20 kg, F<sub>c</sub> = 200 N, F<sub>z</sub> = 100 N, T = 34,64 N")}: ${m("F<sub>w</sub> = 200 − 100 − 34,64 = 65,36 N")} → ${m("a = 65,36 / 20 ≈ 3,27 m/s<sup>2</sup>")}.`
+        },
+
+        /* -------------------- KATEGORIA 5: PĘD I POPĘD SIŁY -------------------- */
+        {
+          id: 24,
+          category: "ped",
+          title: "Pęd ciała",
+          question: "Jak definiujemy pęd ciała, jaka jest jego jednostka oraz na co kluczowego trzeba uważać w ruchu 1D?",
+          formulaMain: `${vec("p")} = m · ${vec("v")} &nbsp;&nbsp;(wartość: p = m · v)`,
+          formulaAlt: `<span class="math-label">Całkowity pęd układu 1D:</span> p<sub>całk</sub> = m<sub>1</sub> · v<sub>1x</sub> + m<sub>2</sub> · v<sub>2x</sub>`,
+          unit: "SI: [p] = kg·m/s = N·s",
+          when: "W każdym zadaniu ze zderzeniami, sprzęganiem wagonów, odrzutem oraz obliczaniem siły uderzenia.",
+          tip: "Pęd jest WEKTOREM! W zadaniach w jednej linii zawsze wybierz oś (np. w prawo = +). Każde ciało jadące w lewo MUSI dostać znak MINUS przy prędkości i pędzie!",
+          redFlag: false,
+          example: `Wózek 1 (4 kg, +6 m/s) i wózek 2 (2 kg, −3 m/s): ${m("p<sub>całk</sub> = 24 + (−6) = +18 N·s")} (w prawo).`
+        },
+        {
+          id: 25,
+          category: "ped",
+          title: "Popęd siły i średnia siła w zderzeniu",
+          question: "Jak popęd siły wiąże się ze zmianą pędu i jak wyznaczyć średnią siłę oddziaływania w czasie zderzenia Δt?",
+          formulaMain: `J = F<sub>śr</sub> · Δt = Δp = m · (v<sub>k</sub> − v<sub>0</sub>) &nbsp;⇒&nbsp; F<sub>śr</sub> = ${frac("|Δp|", "Δt")}`,
+          formulaAlt: `<span class="math-label">II zasada dynamiki (postać pędowa):</span> F<sub>śr</sub> = ${frac("p<sub>k</sub> − p<sub>0</sub>", "Δt")}`,
+          unit: "SI: [J] = [Δp] = N·s = kg·m/s, [F_śr] = N",
+          when: "Gdy w zadaniu podany jest czas trwania zderzenia/odbicia Δt i pytają o średnią siłę oddziaływania ciał lub ściany.",
+          tip: "PUŁAPKA Z ODBICIEM! Gdy piłka uderza w ścianę (+10 m/s) i odbija się z powrotem (−10 m/s), zmiana prędkości to Δv = (−10) − (+10) = −20 m/s, a NIE zero! Zawsze odejmuj z uwzględnieniem znaków!",
+          redFlag: true,
+          example: `Piłka 0,5 kg odbija się z +10 na −10 m/s w ${m("Δt = 0,05 s")}: ${m("Δp = 0,5 · (−20) = −10 N·s")} → ${m("F<sub>śr</sub> = 10 / 0,05 = 200 N")}.`
+        },
+        {
+          id: 26,
+          category: "ped",
+          title: "Zasada zachowania pędu i zderzenie niesprężyste",
+          question: "Jak zapisać zasadę zachowania pędu oraz wzór na wspólną prędkość ciał, które sklejają się w zderzeniu?",
+          formulaMain: `m<sub>1</sub>v<sub>1</sub> + m<sub>2</sub>v<sub>2</sub> = m<sub>1</sub>u<sub>1</sub> + m<sub>2</sub>u<sub>2</sub>`,
+          formulaAlt: `<span class="math-label">Zderzenie doskonale niesprężyste (sklejenie):</span> v<sub>k</sub> = ${frac("m<sub>1</sub>v<sub>1</sub> + m<sub>2</sub>v<sub>2</sub>", "m<sub>1</sub> + m<sub>2</sub>")}`,
+          unit: "Układ izolowany: brak zewnętrznej siły wypadkowej (bez tarcia)",
+          when: "Gdy dwa ciała zderzają się (np. wagony się sprzęgają, pocisk grzęźnie w klocku) na gładkim torze bez oporów zewnętrznych.",
+          tip: "W zderzeniu niesprężystym PĘD jest zawsze zachowany, ale energia kinetyczna MALEJE (różnica ΔE_k = E_k,przed − E_k,po zamienia się w ciepło, dźwięk i odkształcenie).",
+          redFlag: false,
+          example: `Wózek 1 (4 kg, +6 m/s) i wózek 2 (2 kg, −3 m/s) sklejają się: ${m("v<sub>k</sub> = (24 − 6) / (4 + 2) = 18 / 6 = +3 m/s")} (w prawo).`
+        },
+        {
+          id: 27,
+          category: "ped",
+          title: "Zjawisko odrzutu (start ze spoczynku)",
+          question: "Jak obliczyć prędkość odrzutu łódki, karabinu lub armaty, gdy na początku układ był nieruchomy?",
+          formulaMain: `0 = m<sub>1</sub>v<sub>1</sub> + m<sub>2</sub>v<sub>2</sub> &nbsp;⇒&nbsp; v<sub>2</sub> = −${frac("m<sub>1</sub>", "m<sub>2</sub>")} · v<sub>1</sub>`,
+          formulaAlt: `<span class="math-label">Wartości bezwzględne:</span> m<sub>1</sub> · |v<sub>1</sub>| = m<sub>2</sub> · |v<sub>2</sub>|`,
+          unit: "Pęd przed wystrzałem/skokiem: p_przed = 0",
+          when: "Gdy z nieruchomego obiektu coś zostaje wystrzelone (pocisk z armaty), ktoś z niego wyskakuje (człowiek z łódki) lub ciało rozpada się na dwie części.",
+          tip: "Znak MINUS oznacza, że odrzut jest zawsze skierowany przeciwnie do ruchu pocisku/człowieka. Lżejsze ciało dostaje proporcjonalnie większą prędkość, a cięższe mniejszą.",
+          redFlag: false,
+          example: `Człowiek 60 kg wyskakuje z nieruchomej łódki 120 kg z ${m("v<sub>1</sub> = 2 m/s")}: łódka cofa się z ${m("v<sub>2</sub> = −(60/120)·2 = −1 m/s")}.`
+        },
+
+        /* -------------------- KATEGORIA 6: PRACA, MOC I ENERGIA -------------------- */
+        {
+          id: 28,
+          category: "energia",
+          title: "Praca mechaniczna stałej siły",
+          question: "Jak obliczamy pracę stałej siły F działającej pod kątem α do kierunku przesunięcia s?",
+          formulaMain: `W = F · s · cos α`,
+          formulaAlt: `<span class="math-label">Gdy siła działa wzdłuż ruchu (α = 0°):</span> W = F · s`,
+          unit: "SI: [W] = 1 J (dżul) = 1 N·m = 1 kg·m²/s²",
+          when: "Gdy stała siła przesuwa ciało na drodze s — np. człowiek ciągnie skrzynię, dźwig podnosi ciężar (W = m·g·h).",
+          tip: "α to kąt między wektorem SIŁY a kierunkiem PRZESUNIĘCIA! Jeśli siła jest prostopadła do ruchu (np. siła nacisku, reakcji podłoża czy ciężkości na płaskiej podłodze), to cos 90° = 0, więc W = 0 J!",
+          redFlag: false,
+          example: `Człowiek ciągnie sanki siłą 100 N pod kątem 60° (cos 60° = 0,5) na drodze 10 m: ${m("W = 100 · 10 · 0,5 = 500 J")}.`
+        },
+        {
+          id: 29,
+          category: "energia",
+          title: "Praca siły tarcia (oporu)",
+          question: "Jaki wzór opisuje pracę wykonaną przez siłę tarcia i jaki ma ona zawsze znak?",
+          formulaMain: `W<sub>T</sub> = −T · s = −f · F<sub>n</sub> · s`,
+          formulaAlt: `<span class="math-label">Wydzielone ciepło:</span> Q = |W<sub>T</sub>| = T · s`,
+          unit: "SI: [W_T] = J (zawsze wartość ujemna!)",
+          when: "Gdy ciało przesuwa się po chropowatej powierzchni lub równi z tarciem i trzeba wyznaczyć pracę oporów albo ilość wydzielonego ciepła.",
+          tip: "Tarcie działa zawsze przeciwnie do przesunięcia (kąt α = 180°, a cos 180° = −1), więc jego praca jest ZAWSZE UJEMNA — zabiera energię mechaniczną układu i zamienia ją w ciepło.",
+          redFlag: false,
+          example: `Skrzynia jedzie 10 m przy sile tarcia ${m("T = 86,6 N")}: praca tarcia to ${m("W<sub>T</sub> = −866 J")}, a wydzielone ciepło to ${m("Q = 866 J")}.`
+        },
+        {
+          id: 30,
+          category: "energia",
+          title: "Moc mechaniczna (średnia i chwilowa)",
+          question: "Jak obliczamy moc z pracy i czasu oraz jakim wzorem policzyć ją od razu dla stałej prędkości?",
+          formulaMain: `P = ${frac("W", "t")} &nbsp;&nbsp;|&nbsp;&nbsp; P = F · v`,
+          formulaAlt: `<span class="math-label">Z kątem α:</span> P = F · v · cos α &nbsp;|&nbsp; <span class="math-label">Przekształcenie:</span> W = P · t`,
+          unit: "SI: [P] = 1 W (wat) = 1 J/s; 1 kW = 1000 W",
+          when: "Gdy w zadaniu pytają o szybkość wykonywania pracy (moc silnika, dźwigu, pracownika) lub o siłę ciągu przy znanej mocy i prędkości.",
+          tip: "Wzór P = F · v to ogromna oszczędność czasu dla samochodów, pociągów i wind jadących ze STAŁĄ prędkością — nie musisz znać ani drogi, ani czasu! Pamiętaj, by v było w m/s, a moc w watach (W).",
+          redFlag: false,
+          example: `Silnik o mocy ${m("P = 30 kW = 30 000 W")} jedzie ze stałą prędkością ${m("v = 20 m/s")}: siła ciągu to ${m("F = P / v = 30 000 / 20 = 1500 N")}.`
+        },
+        {
+          id: 31,
+          category: "energia",
+          title: "Sprawność urządzenia (η)",
+          question: "Jak obliczyć sprawność maszyny, silnika lub równi pochyłej?",
+          formulaMain: `η = ${frac("W<sub>użyt</sub>", "W<sub>całk</sub>")} · 100% = ${frac("P<sub>użyt</sub>", "P<sub>całk</sub>")} · 100%`,
+          formulaAlt: `<span class="math-label">Energetycznie:</span> η = ${frac("E<sub>wyj</sub>", "E<sub>wej</sub>")} · 100% &nbsp;|&nbsp; W<sub>całk</sub> = W<sub>użyt</sub> + straty`,
+          unit: "Bezwymiarowa: ułamek (0 ≤ η ≤ 1) lub procenty (0%–100%)",
+          when: "Gdy część włożonej pracy lub energii marnuje się na tarcie i ciepło (np. dźwig, silnik, wciąganie skrzyni po równi z tarciem).",
+          tip: "Sprawność nigdy nie może przekroczyć 100% (1) — jeśli wyszło Ci 120%, to zamieniłeś licznik z mianownikiem! Na równi pochyłej praca użyteczna to podniesienie ciężaru (m·g·h), a całkowita to praca ciągnącego (F_c·l).",
+          redFlag: false,
+          example: `Wciągnięcie skrzyni na wysokość h kosztowało ${m("W<sub>użyt</sub> = 2500 J")}, ale z tarciem włożono ${m("W<sub>całk</sub> = 3366 J")}: ${m("η = (2500 / 3366)·100% ≈ 74,3%")}.`
+        },
+        {
+          id: 32,
+          category: "energia",
+          title: "Energia kinetyczna (E_k)",
+          question: "Od czego zależy energia kinetyczna ciała w ruchu postępowym i co się dzieje przy podwojeniu prędkości?",
+          formulaMain: `E<sub>k</sub> = ${frac("m · v<sup>2</sup>", "2")}`,
+          formulaAlt: `<span class="math-label">Związek z pędem:</span> E<sub>k</sub> = ${frac("p<sup>2</sup>", "2m")} &nbsp;|&nbsp; v = ${sqrt(frac("2 E<sub>k</sub>", "m"))}`,
+          unit: "SI: [E_k] = 1 J (dżul)",
+          when: "Gdy ciało o masie m porusza się z prędkością v i analizujemy bilans energii lub stratę energii w zderzeniu.",
+          tip: "Prędkość jest w KWADRACIE! Dwukrotny wzrost prędkości daje CZTEROKROTNY wzrost energii kinetycznej (i 4 razy dłuższą drogę hamowania!). Energia jest skalarem — zawsze ≥ 0, nawet gdy prędkość ma minus.",
+          redFlag: false,
+          example: `Auto ${m("m = 1000 kg")} przy ${m("v = 20 m/s")}: ${m("E<sub>k</sub> = (1000 · 400) / 2 = 200 000 J = 200 kJ")}.`
+        },
+        {
+          id: 33,
+          category: "energia",
+          title: "Energia potencjalna grawitacji (E_p) i sprężystości (E_ps)",
+          question: "Jak obliczamy energię potencjalną ciała na wysokości h oraz rozciągniętej lub ściśniętej sprężyny?",
+          formulaMain: `E<sub>p</sub> = m · g · h &nbsp;&nbsp;|&nbsp;&nbsp; E<sub>ps</sub> = ${frac("k · x<sup>2</sup>", "2")}`,
+          formulaAlt: `<span class="math-label">Wysokość na równi o długości l:</span> h = l · sin α`,
+          unit: "SI: [E_p] = J; [k] = N/m (współczynnik sprężystości), [x] = m",
+          when: "Gdy ciało znajduje się na wysokości h nad poziomem odniesienia lub gdy w zadaniu pojawia się sprężyna ściśnięta/rozciągnięta o x.",
+          tip: "Poziom zerowy h = 0 wybierasz sam — najwygodniej ustawić go w NAJNIŻSZYM punkcie toru (np. u podnóża równi). Pamiętaj zamienić odkształcenie sprężyny x z cm na metry!",
+          redFlag: false,
+          example: `Klocek 2 kg na szczycie równi o długości ${m("l = 10 m, α = 30°")}: ${m("h = 10 · 0,5 = 5 m")} → ${m("E<sub>p</sub> = 2 · 10 · 5 = 100 J")}.`
+        },
+        {
+          id: 34,
+          category: "energia",
+          title: "Zasada zachowania energii mechanicznej (ZZE)",
+          question: "Kiedy całkowita energia mechaniczna pozostaje stała i jak błyskawicznie policzyć z niej prędkość końcową?",
+          formulaMain: `E<sub>k1</sub> + E<sub>p1</sub> = E<sub>k2</sub> + E<sub>p2</sub>`,
+          formulaAlt: `${frac("m v<sub>1</sub><sup>2</sup>", "2")} + mgh<sub>1</sub> = ${frac("m v<sub>2</sub><sup>2</sup>", "2")} + mgh<sub>2</sub> &nbsp;|&nbsp; <span class="math-label">Zjazd z v₁=0:</span> v = ${sqrt("2gh")}`,
+          unit: "Działa TYLKO bez tarcia i oporów powietrza!",
+          when: "W zadaniach bez tarcia (zjazd z gładkiej równi lub zjeżdżalni, wahadło, rzuty), gdy chcesz szybko połączyć wysokość z prędkością bez liczenia czasu.",
+          tip: "Ogromny skrót na kolokwium: prędkość na dole gładkiej równi (v = √(2gh)) NIE zależy ani od masy m, ani od kąta nachylenia równi, ani od jej kształtu — tylko od samej wysokości h!",
+          redFlag: false,
+          example: `Saneczkarz zjeżdża z gładkiej górki o wysokości ${m("h = 5 m")} (${m("v<sub>1</sub> = 0")}): na dole ma ${m("v = √(2 · 10 · 5) = √100 = 10 m/s")}.`
+        },
+        {
+          id: 35,
+          category: "energia",
+          title: "Twierdzenie o pracy i energii (gdy JEST tarcie)",
+          question: "Jak zapisać bilans energii, kiedy w zadaniu pojawia się tarcie lub dodatkowa siła zewnętrzna?",
+          formulaMain: `W<sub>zew</sub> = ΔE<sub>mech</sub> = E<sub>końc</sub> − E<sub>pocz</sub>`,
+          formulaAlt: `<span class="math-label">Dla siły wypadkowej:</span> W<sub>wyp</sub> = ΔE<sub>k</sub> &nbsp;|&nbsp; <span class="math-label">Z tarciem:</span> E<sub>p1</sub> + E<sub>k1</sub> − T·s = E<sub>p2</sub> + E<sub>k2</sub>`,
+          unit: "Strata na ciepło: Q = T · s = f · F_n · s",
+          when: "W zadaniach z energią, w których działa tarcie (np. hamowanie na płaskim, zjazd z chropowatej równi) albo silnik wykonuje pracę zewnętrzną.",
+          tip: "Najprostsza reguła na kolokwium: jeśli JEST tarcie, to nie panikuj — napisz zwykłą zasadę zachowania energii i po prostu ODEJMIJ straty ciepła (T·s) od energii początkowej!",
+          redFlag: false,
+          example: `Klocek z ${m("E<sub>k1</sub> = 100 J")} hamuje na płaskim przy ${m("T = 20 N")} aż do zera (${m("E<sub>k2</sub> = 0")}): ${m("100 − 20·s = 0")} → ${m("s = 5 m")}.`
+        }
+      ];
+
+      /* ========================================================================
+         STAN APLIKACJI I BEZPIECZNY ZAPIS W LOCALSTORAGE
+         ======================================================================== */
+      const STORAGE_KEY_PROGRESS = "fizyka_fiszki_progress_v1";
+      const STORAGE_KEY_THEME = "fizyka_fiszki_theme_v1";
+
+      const state = {
+        view: "cards", // "cards" | "sheet"
+        category: "all",
+        onlyReview: false,
+        searchQuery: "",
+        deckOrder: FLASHCARDS.map((c) => c.id),
+        currentIndex: 0,
+        isFlipped: false,
+        progress: {} // { [cardId]: "known" | "review" }
+      };
+
+      function safeStorageGet(key, fallback) {
+        try {
+          const raw = window.localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch (err) {
+          return fallback;
+        }
+      }
+
+      function safeStorageSet(key, value) {
+        try {
+          window.localStorage.setItem(key, JSON.stringify(value));
+        } catch (err) {
+          // Ignoruj błąd w trybie prywatnym lub zablokowanym iFrame
+        }
+      }
+
+      /* ========================================================================
+         REFERENCJE DOM
+         ======================================================================== */
+      const el = {
+        btnViewCards: document.getElementById("btnViewCards"),
+        btnViewSheet: document.getElementById("btnViewSheet"),
+        btnTheme: document.getElementById("btnTheme"),
+        themeIcon: document.getElementById("themeIcon"),
+
+        statKnown: document.getElementById("statKnown"),
+        statReview: document.getElementById("statReview"),
+        statRemaining: document.getElementById("statRemaining"),
+        statPercent: document.getElementById("statPercent"),
+        progressBar: document.getElementById("progressBar"),
+        progressKnown: document.getElementById("progressKnown"),
+        progressReview: document.getElementById("progressReview"),
+
+        filtersBar: document.getElementById("filtersBar"),
+        searchBarWrap: document.getElementById("searchBarWrap"),
+        searchInput: document.getElementById("searchInput"),
+
+        emptyState: document.getElementById("emptyState"),
+        emptyEmoji: document.getElementById("emptyEmoji"),
+        emptyTitle: document.getElementById("emptyTitle"),
+        emptyDesc: document.getElementById("emptyDesc"),
+        btnResetFilter: document.getElementById("btnResetFilter"),
+
+        flashcardView: document.getElementById("flashcardView"),
+        cheatsheetView: document.getElementById("cheatsheetView"),
+        cheatsheetGrid: document.getElementById("cheatsheetGrid"),
+
+        deckCounter: document.getElementById("deckCounter"),
+        btnShuffle: document.getElementById("btnShuffle"),
+        btnResetProgress: document.getElementById("btnResetProgress"),
+
+        cardScene: document.getElementById("cardScene"),
+        cardInner: document.getElementById("cardInner"),
+        cardFront: document.getElementById("cardFront"),
+        cardBack: document.getElementById("cardBack"),
+
+        frontCatBadge: document.getElementById("frontCatBadge"),
+        frontStatusBadge: document.getElementById("frontStatusBadge"),
+        frontCardNum: document.getElementById("frontCardNum"),
+        frontTitle: document.getElementById("frontTitle"),
+        frontQuestion: document.getElementById("frontQuestion"),
+
+        backCatBadge: document.getElementById("backCatBadge"),
+        backStatusBadge: document.getElementById("backStatusBadge"),
+        backCardNum: document.getElementById("backCardNum"),
+        backTitle: document.getElementById("backTitle"),
+        backMathBlock: document.getElementById("backMathBlock"),
+        backWhen: document.getElementById("backWhen"),
+        backTipBox: document.getElementById("backTipBox"),
+        backTipHead: document.getElementById("backTipHead"),
+        backTip: document.getElementById("backTip"),
+        backExample: document.getElementById("backExample"),
+
+        btnMarkReview: document.getElementById("btnMarkReview"),
+        btnMarkKnown: document.getElementById("btnMarkKnown"),
+        btnPrev: document.getElementById("btnPrev"),
+        btnFlip: document.getElementById("btnFlip"),
+        btnNext: document.getElementById("btnNext"),
+
+        resetModal: document.getElementById("resetModal"),
+        btnCancelReset: document.getElementById("btnCancelReset"),
+        btnConfirmReset: document.getElementById("btnConfirmReset"),
+        toast: document.getElementById("toast")
+      };
+
+      const CARD_BY_ID = Object.fromEntries(FLASHCARDS.map((c) => [c.id, c]));
+
+      /* ========================================================================
+         LOGIKA FILTROWANIA I POBIERANIA AKTUALNEJ TALII
+         ======================================================================== */
+      function stripHtml(htmlStr) {
+        const tmp = document.createElement("div");
+        tmp.innerHTML = htmlStr;
+        return (tmp.textContent || tmp.innerText || "").toLowerCase();
+      }
+
+      function getFilteredCards() {
+        const query = state.searchQuery.trim().toLowerCase();
+        return state.deckOrder
+          .map((id) => CARD_BY_ID[id])
+          .filter((card) => {
+            if (state.category !== "all" && card.category !== state.category) return false;
+            if (state.onlyReview && state.progress[card.id] !== "review") return false;
+            if (state.view === "sheet" && query.length > 0) {
+              const haystack = [
+                card.title,
+                card.question,
+                card.when,
+                card.tip,
+                stripHtml(card.example),
+                stripHtml(card.formulaMain),
+                CAT_MAP[card.category].name
+              ]
+                .join(" ")
+                .toLowerCase();
+              if (!haystack.includes(query)) return false;
+            }
+            return true;
+          });
+      }
+
+      /* ========================================================================
+         POWIADOMIENIE TOAST
+         ======================================================================== */
+      let toastTimer = null;
+      function showToast(message) {
+        el.toast.textContent = message;
+        el.toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          el.toast.classList.remove("show");
+        }, 2100);
+      }
+
+      /* ========================================================================
+         RENDEROWANIE STATYSTYK I PASKA POSTĘPU
+         ======================================================================== */
+      function renderStats() {
+        const total = FLASHCARDS.length;
+        let known = 0;
+        let review = 0;
+
+        for (const card of FLASHCARDS) {
+          const st = state.progress[card.id];
+          if (st === "known") known++;
+          else if (st === "review") review++;
+        }
+
+        const remaining = total - known - review;
+        const knownPct = Math.round((known / total) * 100);
+        const reviewPct = (review / total) * 100;
+
+        el.statKnown.textContent = known;
+        el.statReview.textContent = review;
+        el.statRemaining.textContent = remaining;
+        el.statPercent.textContent = `${knownPct}%`;
+
+        el.progressKnown.style.width = `${(known / total) * 100}%`;
+        el.progressReview.style.width = `${reviewPct}%`;
+        el.progressBar.setAttribute("aria-valuenow", String(knownPct));
+      }
+
+      /* ========================================================================
+         RENDEROWANIE FILTRÓW KATEGORII
+         ======================================================================== */
+      function renderFilters() {
+        const reviewTotal = FLASHCARDS.filter((c) => state.progress[c.id] === "review").length;
+        const htmlParts = [];
+
+        for (const cat of CATEGORIES) {
+          const count =
+            cat.id === "all"
+              ? FLASHCARDS.length
+              : FLASHCARDS.filter((c) => c.category === cat.id).length;
+          const isActive = state.category === cat.id;
+
+          htmlParts.push(`
+            <button
+              type="button"
+              class="filter-pill ${isActive ? "active" : ""}"
+              data-cat="${cat.id}"
+              style="--pill-color: ${cat.color}; --pill-bg: ${cat.bg};"
+            >
+              <span>${cat.name}</span>
+              <span class="pill-count">${count}</span>
+            </button>
+          `);
+        }
+
+        htmlParts.push(`
+          <button
+            type="button"
+            class="filter-pill review-toggle ${state.onlyReview ? "active" : ""}"
+            id="btnOnlyReview"
+          >
+            <span>🔁 Tylko do powtórki</span>
+            <span class="pill-count">${reviewTotal}</span>
+          </button>
+        `);
+
+        el.filtersBar.innerHTML = htmlParts.join("");
+
+        // Podpięcie zdarzeń do przycisków kategorii
+        el.filtersBar.querySelectorAll("[data-cat]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            state.category = btn.getAttribute("data-cat");
+            state.currentIndex = 0;
+            state.isFlipped = false;
+            renderAll();
+          });
+        });
+
+        const btnOnlyReview = document.getElementById("btnOnlyReview");
+        if (btnOnlyReview) {
+          btnOnlyReview.addEventListener("click", () => {
+            state.onlyReview = !state.onlyReview;
+            state.currentIndex = 0;
+            state.isFlipped = false;
+            renderAll();
+          });
+        }
+      }
+
+      /* ========================================================================
+         BUDOWANIE BLOKU WZORÓW MATEMATYCZNYCH
+         ======================================================================== */
+      function buildMathBlockHTML(card) {
+        return `
+          <div class="math-main"><span class="math-line">${card.formulaMain}</span></div>
+          ${card.formulaAlt ? `<div class="math-alt">${card.formulaAlt}</div>` : ""}
+          ${card.unit ? `<div class="math-unit">${card.unit}</div>` : ""}
+        `;
+      }
+
+      function applyStatusBadge(badgeEl, status) {
+        if (status === "known") {
+          badgeEl.style.display = "inline-flex";
+          badgeEl.className = "status-badge known";
+          badgeEl.textContent = "✅ Umiem";
+        } else if (status === "review") {
+          badgeEl.style.display = "inline-flex";
+          badgeEl.className = "status-badge review";
+          badgeEl.textContent = "🔁 Do powtórki";
+        } else {
+          badgeEl.style.display = "none";
+        }
+      }
+
+      /* ========================================================================
+         RENDEROWANIE TRYBU FISZEK 3D
+         ======================================================================== */
+      function renderFlashcardView(cards) {
+        if (cards.length === 0) {
+          el.flashcardView.classList.add("hidden");
+          el.emptyState.classList.add("visible");
+          if (state.onlyReview) {
+            el.emptyEmoji.textContent = "🏆";
+            el.emptyTitle.textContent = "Brak fiszek do powtórki!";
+            el.emptyDesc.textContent =
+              "Świetna robota — nie masz żadnych kart oznaczonych jako „Do powtórki” w tej kategorii.";
+          } else {
+            el.emptyEmoji.textContent = "🔍";
+            el.emptyTitle.textContent = "Brak pasujących fiszek";
+            el.emptyDesc.textContent = "Zmień wybrany filtr, aby zobaczyć wszystkie wzory.";
+          }
+          return;
+        }
+
+        el.emptyState.classList.remove("visible");
+        el.flashcardView.classList.remove("hidden");
+
+        // Bezpieczne ograniczenie indeksu
+        if (state.currentIndex >= cards.length) state.currentIndex = cards.length - 1;
+        if (state.currentIndex < 0) state.currentIndex = 0;
+
+        const card = cards[state.currentIndex];
+        const cat = CAT_MAP[card.category];
+        const status = state.progress[card.id];
+
+        el.deckCounter.textContent = `Fiszka ${state.currentIndex + 1} z ${cards.length}`;
+
+        // Kolor akcentu kategorii na obu stronach karty
+        el.cardFront.style.setProperty("--card-accent", cat.color);
+        el.cardFront.style.setProperty("--card-accent-bg", cat.bg);
+        el.cardBack.style.setProperty("--card-accent", cat.color);
+        el.cardBack.style.setProperty("--card-accent-bg", cat.bg);
+
+        // Przód
+        el.frontCatBadge.textContent = cat.name;
+        el.frontCardNum.textContent = `#${card.id}`;
+        el.frontTitle.textContent = card.title;
+        el.frontQuestion.textContent = card.question;
+        applyStatusBadge(el.frontStatusBadge, status);
+
+        // Tył
+        el.backCatBadge.textContent = cat.name;
+        el.backCardNum.textContent = `#${card.id}`;
+        el.backTitle.textContent = card.title;
+        applyStatusBadge(el.backStatusBadge, status);
+
+        el.backMathBlock.innerHTML = buildMathBlockHTML(card);
+        el.backWhen.innerHTML = card.when;
+        el.backTip.innerHTML = card.tip;
+        el.backExample.innerHTML = card.example;
+
+        if (card.redFlag) {
+          el.backTipBox.classList.add("red-flag");
+          el.backTipHead.textContent = "🚨 Czerwona lampka / Pułapka na kolokwium";
+        } else {
+          el.backTipBox.classList.remove("red-flag");
+          el.backTipHead.textContent = "⚠️ Tip / Pułapka na kolokwium";
+        }
+
+        el.cardInner.classList.toggle("is-flipped", state.isFlipped);
+      }
+
+      /* ========================================================================
+         RENDEROWANIE TRYBU ŚCIĄGAWKI / LISTY
+         ======================================================================== */
+      function renderCheatsheetView(cards) {
+        if (cards.length === 0) {
+          el.cheatsheetGrid.innerHTML = "";
+          el.emptyState.classList.add("visible");
+          el.emptyEmoji.textContent = state.onlyReview ? "🏆" : "🔍";
+          el.emptyTitle.textContent = state.onlyReview
+            ? "Brak wzorów do powtórki!"
+            : "Nic nie znaleziono";
+          el.emptyDesc.textContent = state.onlyReview
+            ? "Wszystkie karty w tej kategorii zostały już opanowane lub wyczyszczone z listy powtórek."
+            : "Spróbuj wpisać inne słowo kluczowe lub wyczyść filtr kategorii.";
+          return;
+        }
+
+        el.emptyState.classList.remove("visible");
+
+        const fragment = cards
+          .map((card) => {
+            const cat = CAT_MAP[card.category];
+            const status = state.progress[card.id];
+            return `
+              <article
+                class="sheet-card"
+                style="--card-accent: ${cat.color}; --card-accent-bg: ${cat.bg};"
+              >
+                <div class="card-top-row">
+                  <span class="cat-badge">${cat.name}</span>
+                  <span class="card-num">#${card.id}</span>
+                </div>
+
+                <h3 class="back-title">${card.title}</h3>
+
+                <div class="math-block">
+                  ${buildMathBlockHTML(card)}
+                </div>
+
+                <div class="info-box when">
+                  <div class="info-box-head">📌 Kiedy stosować</div>
+                  <div>${card.when}</div>
+                </div>
+
+                <div class="info-box tip ${card.redFlag ? "red-flag" : ""}">
+                  <div class="info-box-head">${card.redFlag ? "🚨 Czerwona lampka" : "⚠️ Tip / Pułapka"}</div>
+                  <div>${card.tip}</div>
+                </div>
+
+                <div class="info-box example">
+                  <div class="info-box-head">💡 Przykład</div>
+                  <div>${card.example}</div>
+                </div>
+
+                <div class="sheet-footer">
+                  <button
+                    type="button"
+                    class="sheet-rate-btn ${status === "review" ? "is-review" : ""}"
+                    data-rate-id="${card.id}"
+                    data-rate-val="review"
+                  >
+                    🔁 Do powtórki
+                  </button>
+                  <button
+                    type="button"
+                    class="sheet-rate-btn ${status === "known" ? "is-known" : ""}"
+                    data-rate-id="${card.id}"
+                    data-rate-val="known"
+                  >
+                    ✅ Umiem
+                  </button>
+                </div>
+              </article>
+            `;
+          })
+          .join("");
+
+        el.cheatsheetGrid.innerHTML = fragment;
+
+        // Obsługa oceniania bezpośrednio z widoku Ściągawki
+        el.cheatsheetGrid.querySelectorAll("[data-rate-id]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const id = Number(btn.getAttribute("data-rate-id"));
+            const val = btn.getAttribute("data-rate-val");
+            // Ponowne kliknięcie aktywnego statusu usuwa oznaczenie
+            if (state.progress[id] === val) {
+              delete state.progress[id];
+            } else {
+              state.progress[id] = val;
+            }
+            safeStorageSet(STORAGE_KEY_PROGRESS, state.progress);
+            renderAll();
+          });
+        });
+      }
+
+      /* ========================================================================
+         GŁÓWNA FUNKCJA ODŚWIEŻAJĄCA WIDOK
+         ======================================================================== */
+      function renderAll() {
+        renderStats();
+        renderFilters();
+
+        const cards = getFilteredCards();
+
+        el.searchBarWrap.classList.toggle("visible", state.view === "sheet");
+
+        if (state.view === "cards") {
+          el.cheatsheetView.classList.remove("active");
+          renderFlashcardView(cards);
+        } else {
+          el.flashcardView.classList.add("hidden");
+          el.cheatsheetView.classList.add("active");
+          renderCheatsheetView(cards);
+        }
+      }
+
+      /* ========================================================================
+         AKCJE NA FISZKACH (OBRÓT, NAWIGACJA, OCENA, TASOWANIE)
+         ======================================================================== */
+      function flipCard() {
+        state.isFlipped = !state.isFlipped;
+        el.cardInner.classList.toggle("is-flipped", state.isFlipped);
+      }
+
+      function navigateCard(delta) {
+        const cards = getFilteredCards();
+        if (cards.length <= 1) return;
+        state.currentIndex = (state.currentIndex + delta + cards.length) % cards.length;
+        state.isFlipped = false;
+        renderFlashcardView(cards);
+      }
+
+      function markCurrentCard(status) {
+        const cards = getFilteredCards();
+        if (cards.length === 0) return;
+
+        const currentCard = cards[state.currentIndex];
+        state.progress[currentCard.id] = status;
+        safeStorageSet(STORAGE_KEY_PROGRESS, state.progress);
+
+        showToast(status === "known" ? "✅ Oznaczono jako: Umiem to!" : "🔁 Dodano do powtórki");
+
+        // Po ocenie odwróć z powrotem na przód i przejdź do kolejnej karty
+        state.isFlipped = false;
+        const nextCards = getFilteredCards();
+
+        if (nextCards.length === 0) {
+          renderAll();
+          return;
+        }
+
+        // Jeśli w trybie "Tylko do powtórki" oznaczyliśmy kartę jako "known", lista skróciła się o 1,
+        // więc bieżący indeks już wskazuje na następną kartę.
+        const removedFromList = state.onlyReview && status === "known";
+        if (!removedFromList) {
+          state.currentIndex = (state.currentIndex + 1) % nextCards.length;
+        } else if (state.currentIndex >= nextCards.length) {
+          state.currentIndex = 0;
+        }
+
+        renderAll();
+      }
+
+      function shuffleDeck() {
+        // Algorytm Fisher-Yates
+        const arr = [...state.deckOrder];
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        state.deckOrder = arr;
+        state.currentIndex = 0;
+        state.isFlipped = false;
+        renderAll();
+        showToast("🔀 Talia została przetasowana");
+      }
+
+      /* ========================================================================
+         MOTYW CIEMNY / JASNY
+         ======================================================================== */
+      function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        el.themeIcon.textContent = theme === "dark" ? "☀️" : "🌙";
+        safeStorageSet(STORAGE_KEY_THEME, theme);
+      }
+
+      function toggleTheme() {
+        const current = document.documentElement.getAttribute("data-theme");
+        applyTheme(current === "dark" ? "light" : "dark");
+      }
+
+      /* ========================================================================
+         PRZEŁĄCZANIE TRYBU WIDOKU (FISZKI / ŚCIĄGAWKA)
+         ======================================================================== */
+      function setViewMode(mode) {
+        state.view = mode;
+        el.btnViewCards.classList.toggle("active", mode === "cards");
+        el.btnViewCards.setAttribute("aria-selected", String(mode === "cards"));
+        el.btnViewSheet.classList.toggle("active", mode === "sheet");
+        el.btnViewSheet.setAttribute("aria-selected", String(mode === "sheet"));
+        renderAll();
+      }
+
+      /* ========================================================================
+         OBSŁUGA ZDARZEŃ (MYSZ, DOTYK SWIPE, KLAWIATURA, MODAL)
+         ======================================================================== */
+      function bindEvents() {
+        el.btnViewCards.addEventListener("click", () => setViewMode("cards"));
+        el.btnViewSheet.addEventListener("click", () => setViewMode("sheet"));
+        el.btnTheme.addEventListener("click", toggleTheme);
+
+        // Kliknięcie na fiszkę (z zabezpieczeniem przed przesunięciem/swipe)
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let swipedRecently = false;
+
+        el.cardInner.addEventListener("click", () => {
+          if (swipedRecently) {
+            swipedRecently = false;
+            return;
+          }
+          flipCard();
+        });
+
+        el.cardScene.addEventListener(
+          "touchstart",
+          (e) => {
+            if (e.touches.length !== 1) return;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+          },
+          { passive: true }
+        );
+
+        el.cardScene.addEventListener(
+          "touchend",
+          (e) => {
+            if (e.changedTouches.length !== 1) return;
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            const dy = e.changedTouches[0].clientY - touchStartY;
+            // Rozpoznaj wyraźny gest poziomy (swipe) bez blokowania pionowego przewijania
+            if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+              swipedRecently = true;
+              if (dx < 0) navigateCard(1);
+              else navigateCard(-1);
+            }
+          },
+          { passive: true }
+        );
+
+        el.btnFlip.addEventListener("click", flipCard);
+        el.btnPrev.addEventListener("click", () => navigateCard(-1));
+        el.btnNext.addEventListener("click", () => navigateCard(1));
+        el.btnMarkReview.addEventListener("click", () => markCurrentCard("review"));
+        el.btnMarkKnown.addEventListener("click", () => markCurrentCard("known"));
+        el.btnShuffle.addEventListener("click", shuffleDeck);
+
+        // Wyszukiwarka w trybie Ściągawki
+        el.searchInput.addEventListener("input", (e) => {
+          state.searchQuery = e.target.value;
+          renderAll();
+        });
+
+        // Przycisk wyjścia z pustego stanu
+        el.btnResetFilter.addEventListener("click", () => {
+          state.category = "all";
+          state.onlyReview = false;
+          state.searchQuery = "";
+          el.searchInput.value = "";
+          state.currentIndex = 0;
+          state.isFlipped = false;
+          renderAll();
+        });
+
+        // Modal resetu postępu
+        el.btnResetProgress.addEventListener("click", () => {
+          el.resetModal.classList.add("open");
+        });
+
+        el.btnCancelReset.addEventListener("click", () => {
+          el.resetModal.classList.remove("open");
+        });
+
+        el.resetModal.addEventListener("click", (e) => {
+          if (e.target === el.resetModal) {
+            el.resetModal.classList.remove("open");
+          }
+        });
+
+        el.btnConfirmReset.addEventListener("click", () => {
+          state.progress = {};
+          state.onlyReview = false;
+          state.currentIndex = 0;
+          state.isFlipped = false;
+          safeStorageSet(STORAGE_KEY_PROGRESS, state.progress);
+          el.resetModal.classList.remove("open");
+          renderAll();
+          showToast("↺ Postęp nauki został zresetowany");
+        });
+
+        // Skróty klawiszowe (tylko gdy nie piszemy w wyszukiwarce i modal jest zamknięty)
+        document.addEventListener("keydown", (e) => {
+          if (el.resetModal.classList.contains("open")) {
+            if (e.key === "Escape") el.resetModal.classList.remove("open");
+            return;
+          }
+
+          const activeTag = document.activeElement ? document.activeElement.tagName : "";
+          if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
+          if (state.view !== "cards") return;
+
+          if (e.code === "Space") {
+            e.preventDefault();
+            flipCard();
+          } else if (e.key === "ArrowRight") {
+            e.preventDefault();
+            navigateCard(1);
+          } else if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            navigateCard(-1);
+          } else if (e.key === "1") {
+            e.preventDefault();
+            markCurrentCard("review");
+          } else if (e.key === "2") {
+            e.preventDefault();
+            markCurrentCard("known");
+          }
+        });
+      }
+
+      /* ========================================================================
+         INICJALIZACJA APLIKACJI
+         ======================================================================== */
+      function init() {
+        const savedTheme = safeStorageGet(STORAGE_KEY_THEME, "dark");
+        applyTheme(savedTheme === "light" ? "light" : "dark");
+
+        const savedProgress = safeStorageGet(STORAGE_KEY_PROGRESS, {});
+        if (savedProgress && typeof savedProgress === "object") {
+          state.progress = savedProgress;
+        }
+
+        bindEvents();
+        renderAll();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
